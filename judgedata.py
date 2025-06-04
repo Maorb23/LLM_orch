@@ -3,27 +3,22 @@
 
 import argparse
 import pandas as pd
-
-# Import your evaluator class here.
-# Replace `YourEvaluatorModule` and `YourEvaluatorClass` with actual names.
-from judgeLLM import MultiModelEvaluator
+import json
+from judgeLLM import MultiModelEvaluator, PromptJudge, JudgeFT_Light
 
 
-def evaluate_on_data(data_path, api_key_path,models, embed_model, device, prompt, hf, mm):
+def evaluate_on_data(data_path, api_key_path,models, embed_model, model_name, device, prompt, hf, mm):
     """
     Evaluate the LLM answer against the user query using the specified model.
     """
     # Load the data
-    data = pd.read_csv(data_path)
-    
-    # Initialize the evaluator
+    df = pd.read_csv(data_path)
+    random_rows = df.sample(n=5, random_state=23)  # Returns an object of type DataFrame
     if mm:
         evaluator = MultiModelEvaluator(api_key_path=api_key_path,
                                         models=models,
                                         embed_model_name=embed_model,
                                         device=device)
-        df = pd.read_csv(data_path)
-        random_rows = df.sample(n=5, random_state=23)  # Returns an object of type DataFrame
         for idx, row in random_rows.iterrows():
             user_id    = row["userId"]
             model_id   = row["modelId"]
@@ -50,6 +45,32 @@ def evaluate_on_data(data_path, api_key_path,models, embed_model, device, prompt
             avg = scores["averages"]
             avg_str = ", ".join(f"{k}: {v:.3f}" for k, v in avg.items())
             print(f"AVERAGES → {avg_str}")
+    if prompt:
+        judge = PromptJudge(api_key_path=api_key_path, model_name=model_name)
+        for idx, row in random_rows.iterrows():
+            user_id    = row["userId"]
+            model_id   = row["modelId"]
+            question   = row["user_query"]
+            llm_answer = row["LLM_answer"]
+            print(f"=== Row {idx} (userId={user_id}, model={model_id}) ===")
+            print(f"User Query: {question}")
+            print(f"LLM Answer: {llm_answer}")
+            print("=== PromptJudge Result ===")
+            scores = judge.judge(user_query=question, llm_answer=llm_answer)
+            print(json.dumps(scores, indent=2))
+    elif hf:
+        judge = JudgeFT_Light(checkpoint="ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli", device=-1)
+        for idx, row in random_rows.iterrows():
+            user_id    = row["userId"]
+            model_id   = row["modelId"]
+            question   = row["user_query"]
+            llm_answer = row["LLM_answer"]
+            print(f"=== Row {idx} (userId={user_id}, model={model_id}) ===")
+            print(f"User Query: {question}")
+            print(f"LLM Answer: {llm_answer}")
+            print("=== JudgeFT Result ===")
+            scores = judge.judge(question,llm_answer)
+            print(f"Verdict: {scores}")
     
     
     return scores
@@ -87,6 +108,7 @@ if __name__ == "__main__":
         api_key_path=args.api_key_path,
         models=models,
         embed_model=args.embed_model,
+        model_name=args.model_name,
         device=args.device,
         prompt=args.prompt,
         hf=args.hf,
