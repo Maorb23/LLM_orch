@@ -29,13 +29,13 @@ We have empty dev and prod folders for placeholders, scripts on main.
     \end{cases}
  $$
 
-- Meteor - measures the similarity between the generated answer and the model's answer, using a score computed by:
+- Meteor - measures the similarity between the generated answer and the model's answer, using nltk library and a score computed by:
 
  $$
  Meteor(a, b) = \frac{1}{\sum_{i=1}^{n} \frac{1}{\text{len}(a_i)}} \sum_{i=1}^{n} \text{len}(a_i) \cdot \text{len}(b_i)
  $$
 
- where $a_i$ and $b_i$ are the n-grams of the generated answer and the model's answer, respectively.
+  - where $a_i$ and $b_i$ are the n-grams of the generated answer and the model's answer, respectively.
  - **JudgeFT_Light** - Using finetuned huggingface model on fact checks and Q&A. Tried using multiple models, but the results were not good. Maybe a differnt approach or models trained on different data than mnli, nli and fever.
 
 ### Usage:
