@@ -10,8 +10,8 @@ We have empty dev and prod folders for placeholders, scripts on main.
 - judgedata.py - runnig the classes on 5 random queries and answers from a generated csv with extract_json.py.
 
 ### Classes in judgeLLM.py:
-- **PromptJudge** - Using prompt to judge the answers.
-- **MultiModelEvaluator** - Using **multiple LLM models** to evaluate the answers. We get "labels" (answers) from the model and compute metrics compared to the generated answer the user got. The current metrics are:
+1. **PromptJudge** - Using prompt to judge the answers.
+2. **MultiModelEvaluator** - Using **multiple LLM models** to evaluate the answers. We get "labels" (answers) from the model and compute metrics compared to the generated answer the user got. The current metrics are:
  - *bleu-* measures the similarity between the generated answer and the model's answer, using a score computed by:
 
  ![bleu.png in folder](bleu.png)
@@ -36,7 +36,7 @@ We have empty dev and prod folders for placeholders, scripts on main.
  $$
 
   - where $a_i$ and $b_i$ are the n-grams of the generated answer and the model's answer, respectively.
- - **JudgeFT_Light** - Using finetuned huggingface model on fact checks and Q&A. Tried using multiple models, but the results were not good. Maybe a differnt approach or models trained on different data than mnli, nli and fever.
+ 3. **JudgeFT_Light** - Using finetuned huggingface model on fact checks and Q&A. Tried using multiple models, but the results were not good. Maybe a differnt approach or models trained on different data than mnli, nli and fever.
 
 ### Usage:
 - nebius_api_key- Go to nebius ai studio and generate an api key and plug it in a Nebius_api_key.txt file in the main directory.
