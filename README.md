@@ -13,11 +13,14 @@ We have empty dev and prod folders for placeholders, scripts on main.
 - **PromptJudge** - Using prompt to judge the answers.
 - **MultiModelEvaluator** - Using **multiple LLM models** to evaluate the answers. We get "labels" (answers) from the model and compute metrics compared to the generated answer the user got. The current metrics are:
  - *bleu-* measures the similarity between the generated answer and the model's answer, using a score computed by:
+
  ![alt text](bleu.png)
+ 
  - *rouge-* measures the overlap between the generated answer and the model's answer, computing the overlap of n-grams.
  - *bertscore-* measures the similarity between the generated answer and the model's answer, using a score computed by bert embeddings.
  - *sbert-* measures the similarity between the generated answer and the model's answer, using a score computed by cosine similarity of sentence embeddings using 'all-MiniLM-L6-v2' model.
  - edit_sim - measures the similarity between the generated answer and the model's answer, using a score computed by Levenshtein distance:
+
  $$
  lev(a, b) = \begin{cases}
   |a| + |b| & \text{if } a = \emptyset \text{ or } b = \emptyset \\
@@ -25,12 +28,13 @@ We have empty dev and prod folders for placeholders, scripts on main.
   1 + min(lev(a, b[1:]), lev(a[1:], b), lev(a[1:], b[1:])) & \text{otherwise}
     \end{cases}
  $$
+
 - Meteor - measures the similarity between the generated answer and the model's answer, using a score computed by:
 
  $$
  Meteor(a, b) = \frac{1}{\sum_{i=1}^{n} \frac{1}{\text{len}(a_i)}} \sum_{i=1}^{n} \text{len}(a_i) \cdot \text{len}(b_i)
  $$
- 
+
  where $a_i$ and $b_i$ are the n-grams of the generated answer and the model's answer, respectively.
  - **JudgeFT_Light** - Using finetuned huggingface model on fact checks and Q&A. Tried using multiple models, but the results were not good. Maybe a differnt approach or models trained on different data than mnli, nli and fever.
 
