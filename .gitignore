@@ -1,0 +1,17 @@
+venv/
+venvt/
+.env
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.dll
+*.lib
+*.so
+*.zip
+*.tar
+*.tar.gz
+*.whl
+.json
+.DS_Store
