@@ -14,8 +14,8 @@ We have empty dev and prod folders for placeholders, scripts on main.
 - **MultiModelEvaluator** - Using **multiple LLM models** to evaluate the answers. We get "labels" (answers) from the model and compute metrics compared to the generated answer the user got. The current metrics are:
  - *bleu-* measures the similarity between the generated answer and the model's answer, using a score computed by:
 
- ![alt text](bleu.png)
- 
+ ![bleu.png in folder](bleu.png)
+
  - *rouge-* measures the overlap between the generated answer and the model's answer, computing the overlap of n-grams.
  - *bertscore-* measures the similarity between the generated answer and the model's answer, using a score computed by bert embeddings.
  - *sbert-* measures the similarity between the generated answer and the model's answer, using a score computed by cosine similarity of sentence embeddings using 'all-MiniLM-L6-v2' model.
