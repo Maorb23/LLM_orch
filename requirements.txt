@@ -1,0 +1,10 @@
+pandas
+openai
+transformers 
+torch
+sentence-transformers
+sacrebleu
+rouge_score
+bert_score
+python-Levenshtein
+nltk
