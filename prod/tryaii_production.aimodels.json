@@ -1,0 +1,1722 @@
+[{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf5f"
+  },
+  "modelId": "gpt-4o",
+  "name": "GPT-4o (omni)",
+  "reasoning": false,
+  "webSearch": true,
+  "provider": "OpenAI",
+  "description": "GPT-4o is OpenAI's most advanced model with strong capabilities across multiple domains.",
+  "maxContextTokens": 128000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0025,
+    "outputCostPer1kTokens": 0.01,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "analysis"
+  ],
+  "latencySpeed": "medium",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.openai.com/v1/responses",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.747Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.747Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf60"
+  },
+  "modelId": "gpt-4o-mini",
+  "name": "GPT-4o-mini",
+  "reasoning": false,
+  "webSearch": true,
+  "provider": "OpenAI",
+  "description": "GPT-4o-mini is OpenAI's smallest and fastest model for quick tasks.",
+  "maxContextTokens": 128000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0001,
+    "outputCostPer1kTokens": 0.0004,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning"
+  ],
+  "latencySpeed": "very fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.openai.com/v1/responses",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.747Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.747Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf61"
+  },
+  "modelId": "o3",
+  "name": "o3",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "OpenAI",
+  "description": "OpenAI's most advanced model for complex tasks.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.01,
+    "outputCostPer1kTokens": 0.04,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning"
+  ],
+  "latencySpeed": "very slow",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.openai.com/v1/responses",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"input\": [{ \"role\": \"user\", \"content\":[{ \"type\": \"input_text\", \"text\": \"${prompt}\" }] }],\n    \"text\": {\"format\": {\"type\": \"text\"}},\n    \"reasoning\": {\"effort\": \"medium\"},\n    \"tools\": [],\n    \"store\": true\n  }",
+    "responseMapping": "{\n    \"content\": \"output_text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf62"
+  },
+  "modelId": "claude-3-haiku-20240307",
+  "name": "Claude 3 Haiku (Mar 2024)",
+  "reasoning": false,
+  "webSearch": false,
+  "provider": "Anthropic",
+  "description": "Claude 3 Haiku with 200K token context window. Fast and efficient for simple tasks.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.00025,
+    "outputCostPer1kTokens": 0.00125,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "vision",
+    "multilingual",
+    "fast-responses"
+  ],
+  "latencySpeed": "very fast",
+  "platformIds": {
+    "anthropic": "claude-3-haiku-20240307",
+    "awsBedrock": "anthropic.claude-3-haiku-20240307-v1:0",
+    "gcpVertexAI": "claude-3-haiku@20240307"
+  },
+  "isLatestVersion": true,
+  "baseModelId": "claude-3-haiku",
+  "apiConfig": {
+    "endpoint": "https://api.anthropic.com/v1/messages",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-api-key": "${apiKey}",
+      "anthropic-version": "2023-06-01"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"content[0].text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.output_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf63"
+  },
+  "modelId": "claude-3-7-sonnet-20250219",
+  "name": "Claude 3.7 Sonnet (Feb 2025)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "Anthropic",
+  "description": "Our most intelligent Claude model with extended thinking capabilities and 200K token context window.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.003,
+    "outputCostPer1kTokens": 0.015,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "vision",
+    "multilingual",
+    "extended-thinking"
+  ],
+  "latencySpeed": "medium",
+  "platformIds": {
+    "anthropic": "claude-3-7-sonnet-20250219",
+    "awsBedrock": "anthropic.claude-3-7-sonnet-20250219-v1:0",
+    "gcpVertexAI": "claude-3-7-sonnet@20250219"
+  },
+  "isLatestVersion": true,
+  "baseModelId": "claude-3-7-sonnet",
+  "apiConfig": {
+    "endpoint": "https://api.anthropic.com/v1/messages",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-api-key": "${apiKey}",
+      "anthropic-version": "2023-06-01"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"content[0].text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.output_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf64"
+  },
+  "modelId": "claude-3-5-haiku-20241022",
+  "name": "Claude 3.5 Haiku (Oct 2024)",
+  "reasoning": false,
+  "webSearch": false,
+  "provider": "Anthropic",
+  "description": "Our fastest model with great intelligence for routine tasks and quick responses.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0008,
+    "outputCostPer1kTokens": 0.004,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "vision",
+    "multilingual",
+    "fast-responses"
+  ],
+  "latencySpeed": "very fast",
+  "platformIds": {
+    "anthropic": "claude-3-5-haiku-20241022",
+    "awsBedrock": "anthropic.claude-3-5-haiku-20241022-v1:0",
+    "gcpVertexAI": "claude-3-5-haiku@20241022"
+  },
+  "isLatestVersion": true,
+  "baseModelId": "claude-3-5-haiku",
+  "apiConfig": {
+    "endpoint": "https://api.anthropic.com/v1/messages",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-api-key": "${apiKey}",
+      "anthropic-version": "2023-06-01"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"content[0].text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.output_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf65"
+  },
+  "modelId": "claude-3-5-sonnet-20241022",
+  "name": "Claude 3.5 Sonnet v2 (Oct 2024)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "Anthropic",
+  "description": "Upgraded Claude 3.5 Sonnet with 200K token context window and improved capabilities.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.003,
+    "outputCostPer1kTokens": 0.015,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "vision",
+    "multilingual"
+  ],
+  "latencySpeed": "medium",
+  "platformIds": {
+    "anthropic": "claude-3-5-sonnet-20241022",
+    "awsBedrock": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+    "gcpVertexAI": "claude-3-5-sonnet-v2@20241022"
+  },
+  "isLatestVersion": true,
+  "baseModelId": "claude-3-5-sonnet",
+  "apiConfig": {
+    "endpoint": "https://api.anthropic.com/v1/messages",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-api-key": "${apiKey}",
+      "anthropic-version": "2023-06-01"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"content[0].text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.output_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf66"
+  },
+  "modelId": "claude-3-opus-20240229",
+  "name": "Claude 3 Opus (Feb 2024)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "Anthropic",
+  "description": "Claude 3 Opus with 200K token context window. Anthropic's most powerful model for complex tasks.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.015,
+    "outputCostPer1kTokens": 0.075,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "vision",
+    "multilingual",
+    "long-content"
+  ],
+  "latencySpeed": "very slow",
+  "platformIds": {
+    "anthropic": "claude-3-opus-20240229",
+    "awsBedrock": "anthropic.claude-3-opus-20240229-v1:0",
+    "gcpVertexAI": "claude-3-opus@20240229"
+  },
+  "isLatestVersion": true,
+  "baseModelId": "claude-3-opus",
+  "apiConfig": {
+    "endpoint": "https://api.anthropic.com/v1/messages",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-api-key": "${apiKey}",
+      "anthropic-version": "2023-06-01"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"content[0].text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.output_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf67"
+  },
+  "modelId": "claude-opus-4-20250514",
+  "name": "Claude Opus 4 (May 2025)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "Anthropic",
+  "description": "Claude's latest model for advanced reasoning and complex tasks.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.015,
+    "outputCostPer1kTokens": 0.075,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "multilingual"
+  ],
+  "latencySpeed": "slow",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "claude-opus-4",
+  "apiConfig": {
+    "endpoint": "https://api.anthropic.com/v1/messages",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-api-key": "${apiKey}",
+      "anthropic-version": "2023-06-01"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"content[0].text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.output_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf68"
+  },
+  "modelId": "claude-sonnet-4-20250514",
+  "name": "Claude Sonnet 4 (May 2025)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "Anthropic",
+  "description": "Claude's latest model for advanced reasoning and complex tasks.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.003,
+    "outputCostPer1kTokens": 0.015,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "multilingual"
+  ],
+  "latencySpeed": "medium",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "claude-sonnet-4",
+  "apiConfig": {
+    "endpoint": "https://api.anthropic.com/v1/messages",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-api-key": "${apiKey}",
+      "anthropic-version": "2023-06-01"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"content[0].text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.output_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf69"
+  },
+  "modelId": "gpt-4.1-nano",
+  "name": "GPT-4.1-nano",
+  "reasoning": false,
+  "webSearch": false,
+  "provider": "OpenAI",
+  "description": "OpenAI's most advanced model for complex tasks.",
+  "maxContextTokens": 1048576,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0001,
+    "outputCostPer1kTokens": 0.0004,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.openai.com/v1/responses",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf6a"
+  },
+  "modelId": "gpt-4.1",
+  "name": "GPT-4.1",
+  "reasoning": false,
+  "webSearch": true,
+  "provider": "OpenAI",
+  "description": "OpenAI's most advanced model for complex tasks.",
+  "maxContextTokens": 1048576,
+  "pricing": {
+    "inputCostPer1kTokens": 0.002,
+    "outputCostPer1kTokens": 0.008,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning"
+  ],
+  "latencySpeed": "medium",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.openai.com/v1/responses",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf6b"
+  },
+  "modelId": "o1",
+  "name": "o1",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "OpenAI",
+  "description": "OpenAI's most advanced model for complex tasks.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.015,
+    "outputCostPer1kTokens": 0.06,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning"
+  ],
+  "latencySpeed": "very slow",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.openai.com/v1/responses",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"input\": [{ \"role\": \"user\", \"content\":[{ \"type\": \"input_text\", \"text\": \"${prompt}\" }] }],\n    \"text\": {\"format\": {\"type\": \"text\"}},\n    \"reasoning\": {\"effort\": \"medium\"},\n    \"tools\": [],\n    \"store\": true\n  }",
+    "responseMapping": "{\n    \"content\": \"output_text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.748Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf6c"
+  },
+  "modelId": "o4-mini",
+  "name": "o4-mini",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "OpenAI",
+  "description": "OpenAI's smallest and fastest model for quick tasks.",
+  "maxContextTokens": 200000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0011,
+    "outputCostPer1kTokens": 0.0044,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning"
+  ],
+  "latencySpeed": "medium",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.openai.com/v1/responses",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"input\": [{ \"role\": \"user\", \"content\":[{ \"type\": \"input_text\", \"text\": \"${prompt}\" }] }],\n    \"text\": {\"format\": {\"type\": \"text\"}},\n    \"reasoning\": {\"effort\": \"medium\"},\n    \"tools\": [],\n    \"store\": true\n  }",
+    "responseMapping": "{\n    \"content\": \"output_text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf6d"
+  },
+  "modelId": "o3-mini",
+  "name": "o3-mini",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "OpenAI",
+  "description": "Lightweight OpenAI model with good performance at a lower cost.",
+  "maxContextTokens": 128000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.001,
+    "outputCostPer1kTokens": 0.004,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.openai.com/v1/responses",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"input\": [{ \"role\": \"user\", \"content\":[{ \"type\": \"input_text\", \"text\": \"${prompt}\" }] }],\n    \"text\": {\"format\": {\"type\": \"text\"}},\n    \"reasoning\": {\"effort\": \"medium\"},\n    \"tools\": [],\n    \"store\": true\n  }",
+    "responseMapping": "{\n    \"content\": \"output_text\",\n    \"inputTokens\": \"usage.input_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf6e"
+  },
+  "modelId": "gpt-4.5-preview",
+  "name": "GPT-4.5-preview",
+  "reasoning": false,
+  "webSearch": false,
+  "provider": "OpenAI",
+  "description": "OpenAI's latest model for complex tasks.",
+  "maxContextTokens": 1048576,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0001,
+    "outputCostPer1kTokens": 0.0004,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.openai.com/v1/responses",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf6f"
+  },
+  "modelId": "deepseek-reasoner",
+  "name": "deepseek-reasoner",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "DeepSeek",
+  "description": "DeepSeek's advanced AI model with focus on code and technical content.",
+  "maxContextTokens": 64000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.00055,
+    "outputCostPer1kTokens": 0.00219,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "technical"
+  ],
+  "latencySpeed": "slow",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.deepseek.com/v1/chat/completions",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf70"
+  },
+  "modelId": "deepseek-chat",
+  "name": "deepseek-chat",
+  "reasoning": false,
+  "webSearch": false,
+  "provider": "DeepSeek",
+  "description": "DeepSeek's advanced AI model with focus on code and technical content.",
+  "maxContextTokens": 64000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.00027,
+    "outputCostPer1kTokens": 0.0011,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "technical"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": false,
+  "baseModelId": null,
+  "apiConfig": {
+    "endpoint": "https://api.deepseek.com/v1/chat/completions",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf71"
+  },
+  "modelId": "gemini-1.5-pro",
+  "name": "Gemini 1.5 Pro",
+  "reasoning": false,
+  "webSearch": false,
+  "provider": "Gemini",
+  "description": "Google's most capable multimodal model for highly complex tasks.",
+  "maxContextTokens": 1048576,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0025,
+    "outputCostPer1kTokens": 0.01,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "vision",
+    "multilingual",
+    "long-content"
+  ],
+  "latencySpeed": "medium",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "gemini-1.5-pro",
+  "apiConfig": {
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-goog-api-key": "${apiKey}"
+    },
+    "requestStructure": "{\n    \"contents\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [{ \"text\": \"${prompt}\" }]\n      }\n    ],\n    \"generationConfig\": {\n      \"temperature\": ${temperature},\n      \"maxOutputTokens\": ${maxTokens}\n    }\n  }",
+    "responseMapping": "{\n    \"content\": \"candidates[0].content.parts[0].text\",\n    \"inputTokens\": \"usageMetadata.promptTokenCount\",\n    \"outputTokens\": \"usageMetadata.candidatesTokenCount\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf72"
+  },
+  "modelId": "gemini-1.5-flash",
+  "name": "Gemini 1.5 Flash",
+  "reasoning": false,
+  "webSearch": false,
+  "provider": "Gemini",
+  "description": "Quick and efficient multimodal model for routine tasks.",
+  "maxContextTokens": 1048576,
+  "pricing": {
+    "inputCostPer1kTokens": 0.00015,
+    "outputCostPer1kTokens": 0.0006,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "vision",
+    "multilingual",
+    "fast-responses"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "gemini-1.5-flash",
+  "apiConfig": {
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-goog-api-key": "${apiKey}"
+    },
+    "requestStructure": "{\n    \"contents\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [{ \"text\": \"${prompt}\" }]\n      }\n    ],\n    \"generationConfig\": {\n      \"temperature\": ${temperature},\n      \"maxOutputTokens\": ${maxTokens}\n    }\n  }",
+    "responseMapping": "{\n    \"content\": \"candidates[0].content.parts[0].text\",\n    \"inputTokens\": \"usageMetadata.promptTokenCount\",\n    \"outputTokens\": \"usageMetadata.candidatesTokenCount\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf73"
+  },
+  "modelId": "gemini-2.0-flash-lite",
+  "name": "Gemini 2.0 Flash Lite",
+  "reasoning": false,
+  "webSearch": false,
+  "provider": "Gemini",
+  "description": "Google's latest multimodal model with improved capabilities.",
+  "maxContextTokens": 1048576,
+  "pricing": {
+    "inputCostPer1kTokens": 0.000075,
+    "outputCostPer1kTokens": 0.0003,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "image",
+    "video",
+    "audio",
+    "multilingual",
+    "fast-responses"
+  ],
+  "latencySpeed": "very fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "gemini-2.0-flash-lite",
+  "apiConfig": {
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-goog-api-key": "${apiKey}"
+    },
+    "requestStructure": "{\n    \"contents\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [{ \"text\": \"${prompt}\" }]\n      }\n    ],\n    \"generationConfig\": {\n      \"temperature\": ${temperature},\n      \"maxOutputTokens\": ${maxTokens}\n    }\n  }",
+    "responseMapping": "{\n    \"content\": \"candidates[0].content.parts[0].text\",\n    \"inputTokens\": \"usageMetadata.promptTokenCount\",\n    \"outputTokens\": \"usageMetadata.candidatesTokenCount\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf74"
+  },
+  "modelId": "gemini-2.0-flash",
+  "name": "Gemini 2.0 Flash",
+  "reasoning": false,
+  "webSearch": true,
+  "provider": "Gemini",
+  "description": "Google's latest multimodal model with improved capabilities.",
+  "maxContextTokens": 1048576,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0001,
+    "outputCostPer1kTokens": 0.0004,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "vision",
+    "multilingual",
+    "fast-responses"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "gemini-2.0-flash",
+  "apiConfig": {
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-goog-api-key": "${apiKey}"
+    },
+    "requestStructure": "{\n    \"contents\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [{ \"text\": \"${prompt}\" }]\n      }\n    ],\n    \"generationConfig\": {\n      \"temperature\": ${temperature},\n      \"maxOutputTokens\": ${maxTokens}\n    }\n  }",
+    "responseMapping": "{\n    \"content\": \"candidates[0].content.parts[0].text\",\n    \"inputTokens\": \"usageMetadata.promptTokenCount\",\n    \"outputTokens\": \"usageMetadata.candidatesTokenCount\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf75"
+  },
+  "modelId": "gemini-2.5-flash-preview-05-20",
+  "name": "Gemini 2.5 Flash (Apr 2025)",
+  "reasoning": true,
+  "webSearch": true,
+  "provider": "Gemini",
+  "description": "Google's latest multimodal model with improved capabilities.",
+  "maxContextTokens": 1048576,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0001,
+    "outputCostPer1kTokens": 0.0004,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "vision",
+    "multilingual",
+    "fast-responses"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "gemini-2.5-flash",
+  "apiConfig": {
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-goog-api-key": "${apiKey}"
+    },
+    "requestStructure": "{\n    \"contents\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [{ \"text\": \"${prompt}\" }]\n      }\n    ],\n    \"generationConfig\": {\n      \"temperature\": ${temperature},\n      \"maxOutputTokens\": ${maxTokens}\n    }\n  }",
+    "responseMapping": "{\n    \"content\": \"candidates[0].content.parts[0].text\",\n    \"inputTokens\": \"usageMetadata.promptTokenCount\",\n    \"outputTokens\": \"usageMetadata.candidatesTokenCount\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.749Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf76"
+  },
+  "modelId": "gemini-2.5-pro-preview-05-06",
+  "name": "Gemini 2.5 Pro (May 2025)",
+  "reasoning": true,
+  "webSearch": true,
+  "provider": "Gemini",
+  "description": "Google's latest multimodal model with improved capabilities.",
+  "maxContextTokens": 1048576,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0025,
+    "outputCostPer1kTokens": 0.01,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "vision",
+    "multilingual",
+    "fast-responses"
+  ],
+  "latencySpeed": "slow",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "gemini-2.5-pro",
+  "apiConfig": {
+    "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent",
+    "headers": {
+      "Content-Type": "application/json",
+      "x-goog-api-key": "${apiKey}"
+    },
+    "requestStructure": "{\n    \"contents\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [{ \"text\": \"${prompt}\" }]\n      }\n    ],\n    \"generationConfig\": {\n      \"temperature\": ${temperature},\n      \"maxOutputTokens\": ${maxTokens}\n    }\n  }",
+    "responseMapping": "{\n    \"content\": \"candidates[0].content.parts[0].text\",\n    \"inputTokens\": \"usageMetadata.promptTokenCount\",\n    \"outputTokens\": \"usageMetadata.candidatesTokenCount\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf77"
+  },
+  "modelId": "mistral-large-latest",
+  "name": "Mistral Large (Latest)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "Mistral",
+  "description": "Mistral's most powerful model for advanced reasoning and complex tasks.",
+  "maxContextTokens": 131000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.002,
+    "outputCostPer1kTokens": 0.006,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "multilingual"
+  ],
+  "latencySpeed": "medium",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "mistral-large",
+  "apiConfig": {
+    "endpoint": "https://api.mistral.ai/v1/chat/completions",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf78"
+  },
+  "modelId": "mistral-small-latest",
+  "name": "Mistral Small (Latest)",
+  "reasoning": false,
+  "webSearch": false,
+  "provider": "Mistral",
+  "description": "Mistral's smallest model for quick tasks.",
+  "maxContextTokens": 131000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0001,
+    "outputCostPer1kTokens": 0.0001,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "multilingual"
+  ],
+  "latencySpeed": "very fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "mistral-small",
+  "apiConfig": {
+    "endpoint": "https://api.mistral.ai/v1/chat/completions",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf79"
+  },
+  "modelId": "grok-3-latest",
+  "name": "Grok 3 (Latest)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "XAI",
+  "description": "XAI's latest model for advanced reasoning and complex tasks.",
+  "maxContextTokens": 131000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.003,
+    "outputCostPer1kTokens": 0.015,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "multilingual"
+  ],
+  "latencySpeed": "medium",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "grok-3",
+  "apiConfig": {
+    "endpoint": "https://api.xai.com/v1/chat/completions",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf7a"
+  },
+  "modelId": "grok-3-fast-latest",
+  "name": "Grok 3 Fast (Latest)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "XAI",
+  "description": "XAI's fastest model for advanced reasoning and complex tasks.",
+  "maxContextTokens": 131000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.005,
+    "outputCostPer1kTokens": 0.025,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "multilingual"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "grok-3-fast",
+  "apiConfig": {
+    "endpoint": "https://api.xai.com/v1/chat/completions",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf7b"
+  },
+  "modelId": "grok-3-mini-latest",
+  "name": "Grok 3 Mini (Latest)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "XAI",
+  "description": "XAI's smallest model for quick tasks.",
+  "maxContextTokens": 131000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0003,
+    "outputCostPer1kTokens": 0.0005,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "multilingual"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "grok-3-mini",
+  "apiConfig": {
+    "endpoint": "https://api.xai.com/v1/chat/completions",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6838f4347aeb3eccaf88bf7c"
+  },
+  "modelId": "grok-3-mini-fast-latest",
+  "name": "Grok 3 Mini Fast (Latest)",
+  "reasoning": true,
+  "webSearch": false,
+  "provider": "XAI",
+  "description": "XAI's fastest model for quick tasks.",
+  "maxContextTokens": 131000,
+  "pricing": {
+    "inputCostPer1kTokens": 0.0006,
+    "outputCostPer1kTokens": 0.004,
+    "currency": "USD"
+  },
+  "capabilities": [
+    "text",
+    "code",
+    "reasoning",
+    "multilingual"
+  ],
+  "latencySpeed": "fast",
+  "platformIds": {
+    "anthropic": null,
+    "awsBedrock": null,
+    "gcpVertexAI": null
+  },
+  "isLatestVersion": true,
+  "baseModelId": "grok-3-mini-fast",
+  "apiConfig": {
+    "endpoint": "https://api.xai.com/v1/chat/completions",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${apiKey}"
+    },
+    "requestStructure": "{\n    \"model\": \"${modelId}\",\n    \"messages\": [{ \"role\": \"user\", \"content\": \"${prompt}\" }],\n    \"max_tokens\": ${maxTokens},\n    \"temperature\": ${temperature}\n  }",
+    "responseMapping": "{\n    \"content\": \"choices[0].message.content\",\n    \"inputTokens\": \"usage.prompt_tokens\",\n    \"outputTokens\": \"usage.completion_tokens\"\n  }"
+  },
+  "isActive": true,
+  "usageStats": {
+    "totalRequests": 0,
+    "totalInputTokens": 0,
+    "totalOutputTokens": 0,
+    "totalCost": 0,
+    "averageLatencyMs": 0,
+    "lastUsed": {
+      "$date": "2025-05-29T23:56:36.675Z"
+    }
+  },
+  "createdAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-29T23:56:36.750Z"
+  }
+}]
