@@ -463,27 +463,10 @@ if __name__ == "__main__":
     default="The President of the United States has several key responsibilities and authorities, including serving as the Commander-in-Chief of the armed forces, enforcing and executing State and federal laws, conducting foreign policy, appointing federal and state officials, issuing binding interpretations of the Constitution, and ensuring the nation's security and welfare.",
     help="LLM-generated answer to judge."
     )
-    parser.add_argument(
-    "--prompt",
-    action="store_true",
-    help="If set, use PromptJudge for judging (default: False)."
-    )
-    parser.add_argument(
-        "--hf",
-        action="store_true",
-        help="If set, use JudgeFT (Hugging Face) for judging (default: False)."
-    )
-    parser.add_argument(
-        "--embed_model", "-e",
-        default="all-MiniLM-L6-v2",
-        help="SentenceTransformer model name for embedding (default: all-MiniLM-L6-v2)."
-    )
-    parser.add_argument(
-        "--device", "-d",
-        type=int,
-        default=-1,
-        help="CUDA device index for embedding model, or -1 for CPU."
-    )
+    parser.add_argument("--prompt",action="store_true",help="If set, use PromptJudge for judging (default: False).")
+    parser.add_argument("--hf",action="store_true",help="If set, use JudgeFT (Hugging Face) for judging (default: False).")
+    parser.add_argument("--embed_model",default="all-MiniLM-L6-v2",help="SentenceTransformer model name for embedding (default: all-MiniLM-L6-v2).")
+    parser.add_argument("--device",type=int,default=-1,help="CUDA device index for embedding model, or -1 for CPU.")
     parser.add_argument("--mm", action="store_true",
                         help="If set, use MultiModelEvaluator for judging (default: False).")
     parser.add_argument("--data_path", type=str, default="each_prompt_row.csv",
