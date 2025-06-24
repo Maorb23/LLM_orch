@@ -8,6 +8,8 @@ We have empty dev and prod folders for placeholders, scripts on main.
 - extract_json.py - Extracts csv from json. creates for **each query** a new row.
 - judgeLLM.py - our classes with main for testing on generated queries and answers. Right now focuesed only on **Non-code** queries and answers. Adding code suppport might be hard to do good but can use same logic for an above averag judge initially.
 - judgedata.py - runnig the classes on 5 random queries and answers from a generated csv with extract_json.py.
+- classify_query.py - **Multi-method query classification system** that categorizes user queries into 6 types (CODE_TECHNICAL, MATHEMATICAL_SCIENTIFIC, EDUCATIONAL_ACADEMIC, CREATIVE_ARTISTIC, BUSINESS_PROFESSIONAL, CONVERSATIONAL_ADVICE) using three approaches: **LLM-based classification** (primary), **embedding similarity** (semantic), and **rule-based keyword matching** (fallback). Routes queries to appropriate specialized models and includes response quality judgment.
+- tests.py - testing category assignment and turning abbreviations into full words for the classify_query.py script.
 
 ### Classes in judgeLLM.py:
 1. **PromptJudge** - Using prompt to judge the answers.
@@ -43,3 +45,6 @@ We have empty dev and prod folders for placeholders, scripts on main.
 - dev and prod folders - add a dev and prod folder in the main directory, they are empty for now.
 - run extract_json.py - this will create a csv file with the queries and answers from the json file.
 - test judgeLLM.py and judgedata.py.
+
+
+
