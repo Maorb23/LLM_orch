@@ -1,4 +1,4 @@
-from classify_query_updated import LLMQueryRouter
+from classify_query import LLMQueryRouter
 import argparse
 
 def test_absorbed_categories():
@@ -38,7 +38,7 @@ def test_absorbed_categories():
         print(f"✅ Confidence: {classification.get('confidence', 0):.3f}")
         print(f"✅ Response: {result.get('response', 'No response')[:200]}...")
 
-from classify_query import QueryPreprocessor
+from archive.classify_query_old import QueryPreprocessor
 
 def test_enhanced_tech_terms():
     preprocessor = QueryPreprocessor()

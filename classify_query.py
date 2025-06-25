@@ -5,16 +5,187 @@ import time
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 from openai import OpenAI
-import numpy as np
 from sentence_transformers import SentenceTransformer
 import logging
-
-# Configure logging with more detailed format
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s'
-)
+import re
+import numpy as np
+from collections import defaultdict, Counter
+# Configure concise logging
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
+
+# Enhanced imports for NLP processing
+try:
+    import nltk
+    from nltk.tokenize import word_tokenize
+    from nltk.corpus import stopwords, wordnet
+    from nltk.stem import WordNetLemmatizer, PorterStemmer
+    from nltk.chunk import ne_chunk
+    from nltk.tag import pos_tag
+    
+    # Download required NLTK data if not present
+    def ensure_nltk_data():
+        required_data = ['punkt', 'stopwords', 'averaged_perceptron_tagger', 'wordnet', 'maxent_ne_chunker', 'words']
+        for data_name in required_data:
+            try:
+                nltk.data.find(f'tokenizers/{data_name}')
+            except LookupError:
+                try:
+                    nltk.data.find(f'corpora/{data_name}')
+                except LookupError:
+                    try:
+                        nltk.data.find(f'taggers/{data_name}')
+                    except LookupError:
+                        try:
+                            nltk.data.find(f'chunkers/{data_name}')
+                        except LookupError:
+                            logger.info(f"Downloading NLTK data: {data_name}")
+                            nltk.download(data_name, quiet=True)
+    
+    # Initialize NLTK data
+    ensure_nltk_data()
+    NLTK_AVAILABLE = True
+    logger.info("NLTK successfully loaded and configured")
+    
+except ImportError:
+    logger.warning("NLTK not available - falling back to basic text processing")
+    NLTK_AVAILABLE = False
+
+
+# Enhanced NLP Features for Advanced Classification
+from collections import defaultdict
+from typing import Set
+try:
+    from nltk.stem import WordNetLemmatizer, PorterStemmer
+    from nltk.chunk import ne_chunk
+    from nltk.tag import pos_tag
+    from nltk.corpus import wordnet
+    ADVANCED_NLTK_AVAILABLE = True
+    logger.info("Advanced NLTK features available")
+except ImportError:
+    ADVANCED_NLTK_AVAILABLE = False
+    logger.warning("Advanced NLTK features not available")
+
+class DomainLexiconBuilder:
+    """Builds comprehensive domain-specific lexicons using NLTK and external resources"""
+    
+    def __init__(self):
+        if ADVANCED_NLTK_AVAILABLE:
+            self.stemmer = PorterStemmer()
+            self.lemmatizer = WordNetLemmatizer()
+        else:
+            self.stemmer = None
+            self.lemmatizer = None
+        
+        # Enhanced base domain lexicons
+        self.base_lexicons = {
+            'technical': {
+                'programming': [
+                    'algorithm', 'array', 'binary', 'class', 'compile', 'debug', 'function',
+                    'inheritance', 'loop', 'method', 'object', 'parameter', 'recursion',
+                    'syntax', 'variable', 'framework', 'library', 'module', 'package',
+                    'repository', 'version', 'branch', 'commit', 'merge', 'pull', 'push'
+                ],
+                'data_science': [
+                    'correlation', 'regression', 'classification', 'clustering', 'feature',
+                    'dataset', 'training', 'validation', 'testing', 'model', 'prediction',
+                    'accuracy', 'precision', 'recall', 'statistics', 'probability',
+                    # Computer vision and biomedical terms
+                    'computer', 'vision', 'image', 'processing', 'segmentation', 'detection',
+                    'iou', 'intersection', 'union', 'bounding', 'box', 'mask', 'pixel',
+                    'opencv', 'convolution', 'filter', 'edge', 'contour', 'morphology',
+                    'biomedical', 'microscopy', 'cell', 'tissue', 'medical', 'imaging',
+                    'analysis', 'measurement', 'quantification', 'visualization', 'optimize'
+                ]
+            },
+            'business': {
+                'legal': [
+                    'contract', 'agreement', 'clause', 'liability', 'negligence',
+                    'compliance', 'regulation', 'statute', 'lawsuit', 'litigation',
+                    'intellectual', 'property', 'trademark', 'copyright', 'patent'
+                ],
+                'finance': [
+                    'revenue', 'profit', 'budget', 'investment', 'return', 'capital',
+                    'expense', 'income', 'cash', 'flow', 'balance', 'sheet'
+                ]
+            },
+            'academic': {
+                'research': [
+                    'hypothesis', 'methodology', 'experiment', 'observation', 'analysis',
+                    'conclusion', 'literature', 'review', 'citation', 'benefits', 'advantages'
+                ],
+                'science': [
+                    'theory', 'principle', 'law', 'equation', 'formula', 'calculation',
+                    'renewable', 'energy', 'climate', 'environment', 'sustainability'
+                ]
+            }
+        }
+        
+        self.expanded_lexicons = self._expand_lexicons()
+    
+    def _expand_lexicons(self) -> Dict[str, Set[str]]:
+        """Expand base lexicons using WordNet and morphological variations"""
+        expanded = defaultdict(set)
+        
+        for domain, subdomains in self.base_lexicons.items():
+            for subdomain, terms in subdomains.items():
+                key = f"{domain}_{subdomain}"
+                expanded[key] = set()
+                
+                for term in terms:
+                    # Add original term
+                    expanded[key].add(term)
+                    
+                    # Add morphological variations
+                    expanded[key].add(term + 's')  # plural
+                    expanded[key].add(term + 'ing')  # gerund
+                    expanded[key].add(term + 'ed')  # past tense
+                    
+                    # Add WordNet synsets if available
+                    if ADVANCED_NLTK_AVAILABLE:
+                        try:
+                            synsets = wordnet.synsets(term)
+                            for synset in synsets[:2]:  # Limit to top 2 synsets
+                                for lemma in synset.lemmas():
+                                    synonym = lemma.name().replace('_', ' ')
+                                    if len(synonym) > 2:
+                                        expanded[key].add(synonym)
+                        except Exception:
+                            pass  # Skip if WordNet lookup fails
+                    
+                    # Add stem and lemma if available
+                    if self.stemmer and self.lemmatizer:
+                        try:
+                            expanded[key].add(self.stemmer.stem(term))
+                            expanded[key].add(self.lemmatizer.lemmatize(term))
+                        except Exception:
+                            pass
+        
+        # Create aggregate domain lexicons
+        for domain in ['technical', 'business', 'academic']:
+            expanded[domain] = set()
+            for key in expanded.keys():
+                if key.startswith(domain + '_'):
+                    expanded[domain].update(expanded[key])
+        
+        return dict(expanded)
+    
+    def get_domain_terms(self, domain: str) -> Set[str]:
+        """Get all terms for a specific domain"""
+        return self.expanded_lexicons.get(domain, set())
+
+class EnhancedQueryFeatures:
+    """Enhanced feature set for advanced query classification"""
+    
+    def __init__(self):
+        self.domain_densities = {}
+        self.intent_patterns = []
+        self.question_type = None
+        self.complexity_indicators = {}
+        self.lexical_diversity = 0.0
+        self.pos_tags = []
+        self.named_entities = []
+
 
 # This is a 
 @dataclass
@@ -204,7 +375,6 @@ class QueryPreprocessor:
         
         # Create comprehensive technical terms list for feature extraction
         self.all_tech_terms = self._build_comprehensive_tech_terms()
-        logger.info(f"Built comprehensive tech terms list with {len(self.all_tech_terms)} terms")
         
         # Common action verbs that indicate query intent
         self.action_verbs = [
@@ -214,28 +384,24 @@ class QueryPreprocessor:
             'help', 'show', 'demonstrate', 'convert', 'transform', 'migrate'
         ]
         
-        logger.info("QueryPreprocessor initialization completed")
+        logger.info("QueryPreprocessor ready")
     
     def _build_comprehensive_tech_terms(self) -> set:
         """
         Build a comprehensive set of all technical terms for feature extraction
         Combines normalized terms + preserved terms + original shortened forms
         """
-        logger.info("Building comprehensive technical terms list")
         
         all_terms = set()
         
         # Add all normalized/expanded terms
         all_terms.update(self.shortened_tech_terms.values())
-        logger.info(f"Added {len(self.shortened_tech_terms.values())} normalized terms")
         
         # Add all preserved terms
         all_terms.update(self.preserve_tech_terms)
-        logger.info(f"Added {len(self.preserve_tech_terms)} preserved terms")
         
         # Add original shortened forms (they might appear in queries)
         all_terms.update(self.shortened_tech_terms.keys())
-        logger.info(f"Added {len(self.shortened_tech_terms.keys())} shortened forms")
         
         # Add common variations and plurals
         additional_terms = set()
@@ -250,8 +416,6 @@ class QueryPreprocessor:
                     additional_terms.add(acronym)
         
         all_terms.update(additional_terms)
-        logger.info(f"Added {len(additional_terms)} variations and plurals")
-        logger.info(f"Total comprehensive tech terms: {len(all_terms)}")
         
         return all_terms
     
@@ -265,17 +429,15 @@ class QueryPreprocessor:
         Returns:
             Normalized query string
         """
-        logger.info(f"Starting text normalization for query: '{query[:50]}...'")
+        logger.info(f"Normalizing: '{query[:30]}...'")
         import re
         
         # Basic cleaning
         normalized = query.strip().lower()
-        logger.info(f"After basic cleaning: '{normalized[:50]}...'")
         
         # Expand common abbreviations (but preserve context)
         words = normalized.split()
         normalized_words = []
-        expansions_made = 0
         
         for word in words:
             # Remove punctuation for matching but preserve it
@@ -286,8 +448,6 @@ class QueryPreprocessor:
             if clean_word in self.shortened_tech_terms:
                 expanded = self.shortened_tech_terms[clean_word]
                 normalized_words.append(expanded + punctuation)
-                logger.info(f"Expanded '{clean_word}' to '{expanded}'")
-                expansions_made += 1
             else:
                 normalized_words.append(word)
         
@@ -296,59 +456,65 @@ class QueryPreprocessor:
         # Remove excessive whitespace
         normalized = re.sub(r'\s+', ' ', normalized)
         
-        logger.info(f"Text normalization completed. Made {expansions_made} expansions")
-        logger.info(f"Final normalized text: '{normalized[:100]}...'")
-        
         return normalized
     
     def extract_features(self, query: str) -> Dict:
         """
-        Extract key features from the query for classification using comprehensive tech terms
+        Enhanced feature extraction with advanced NLP analysis
         
         Args:
             query: Normalized query string
             
         Returns:
-            Dictionary containing extracted features
+            Dictionary containing extracted features with enhanced NLP analysis
         """
-        logger.info(f"Starting feature extraction for query: '{query[:50]}...'")
+        logger.info(f"Extracting enhanced features from: '{query[:30]}...'")
         import re
         
-        words = query.lower().split()
-        logger.info(f"Query split into {len(words)} words")
+        # Initialize lexicon builder if not exists
+        if not hasattr(self, 'lexicon_builder'):
+            self.lexicon_builder = DomainLexiconBuilder()
         
-        # Find technical keywords using comprehensive list
+        words = query.lower().split()
+        
+        # Enhanced technical keyword extraction
         tech_keywords = []
         for word in words:
             # Clean word for matching
             clean_word = re.sub(r'[^\w]', '', word)
             if clean_word in self.all_tech_terms:
                 tech_keywords.append(clean_word)
-                logger.info(f"Found tech keyword: '{clean_word}'")
         
         # Also check for multi-word technical terms
         query_lower = query.lower()
-        multiword_matches = 0
         for term in self.all_tech_terms:
             if ' ' in term and term in query_lower:
                 tech_keywords.append(term)
-                multiword_matches += 1
-                logger.info(f"Found multi-word tech term: '{term}'")
-        
-        logger.info(f"Found {multiword_matches} multi-word technical terms")
         
         # Remove duplicates while preserving order
-        original_count = len(tech_keywords)
         tech_keywords = list(dict.fromkeys(tech_keywords))
-        logger.info(f"Removed {original_count - len(tech_keywords)} duplicate tech keywords")
+        
+        # Enhanced domain-specific term extraction
+        domain_terms = {}
+        for domain in ['technical', 'business', 'academic']:
+            domain_lexicon = self.lexicon_builder.get_domain_terms(domain)
+            found_terms = [word for word in words if word in domain_lexicon]
+            # Add multi-word terms
+            for term in domain_lexicon:
+                if ' ' in term and term in query_lower and term not in found_terms:
+                    found_terms.append(term)
+            domain_terms[domain] = list(set(found_terms))
         
         # Find action verbs
         action_verbs = [word for word in words if word in self.action_verbs]
-        logger.info(f"Found action verbs: {action_verbs}")
         
-        # Basic complexity indicators
+        # Enhanced complexity indicators
         complexity_indicators = {
-            'has_code_markers': bool(re.search(r'[{}()\[\];]', query)),
+            'has_code_markers': bool(re.search(r'[{}()\[\];]|def\s+|class\s+|import\s+', query)),
+            'has_math_symbols': bool(re.search(r'[∑∏∫∂∇]|\\|equation|formula', query)),
+            'has_technical_jargon': len([w for w in words if w in ['implementation', 'architecture', 'optimization', 'scalability', 'performance']]) > 0,
+            'has_academic_language': len([w for w in words if w in ['hypothesis', 'methodology', 'empirical', 'theoretical', 'systematic']]) > 0,
+            'has_formal_language': len([w for w in words if w in ['furthermore', 'consequently', 'nevertheless', 'accordingly']]) > 0,
             'has_special_chars': bool(re.search(r'[<>@#$%^&*]', query)),
             'word_count': len(words),
             'char_count': len(query),
@@ -358,28 +524,76 @@ class QueryPreprocessor:
             'tech_density': len(tech_keywords) / len(words) if words else 0
         }
         
-        logger.info(f"Complexity indicators: {complexity_indicators}")
+        # Intent pattern detection
+        intent_patterns = {
+            'how_to': bool(re.search(r'\b(how\s+to|how\s+do\s+i|how\s+can\s+i)\b', query)),
+            'what_is': bool(re.search(r'\b(what\s+is|what\s+are|what\s+does)\b', query)),
+            'why': bool(re.search(r'\b(why\s+is|why\s+do|why\s+does|why\s+are)\b', query)),
+            'explain': bool(re.search(r'\b(explain|describe|tell\s+me\s+about)\b', query)),
+            'create': bool(re.search(r'\b(create|build|make|generate|write)\b', query)),
+            'fix': bool(re.search(r'\b(fix|debug|solve|resolve|troubleshoot)\b', query)),
+            'analyze': bool(re.search(r'\b(analyze|examine|study|investigate)\b', query)),
+            'optimize': bool(re.search(r'\b(optimize|improve|enhance|maximize|minimize)\b', query)),
+            'find': bool(re.search(r'\b(find|locate|identify|detect|discover)\b', query)),
+            'calculate': bool(re.search(r'\b(calculate|compute|measure|determine)\b', query))
+        }
+        
+        # Question type detection
+        question_type = 'general'
+        if re.search(r'^(what|when|where|who|which)\b', query.lower().strip()):
+            question_type = 'factual'
+        elif re.search(r'^(how|how\s+to|how\s+do|how\s+can)\b', query.lower().strip()):
+            question_type = 'procedural'
+        elif re.search(r'^(why|what\s+causes|what\s+makes)\b', query.lower().strip()):
+            question_type = 'causal'
+        elif re.search(r'\b(better|worse|difference|compare|versus|vs)\b', query.lower()):
+            question_type = 'comparative'
+        elif re.search(r'\b(should|would|could|recommend|suggest|opinion)\b', query.lower()):
+            question_type = 'evaluative'
+        elif re.search(r'\b(create|write|design|compose|generate)\b', query.lower()):
+            question_type = 'creative'
+        elif re.search(r'\b(analyze|examine|study|investigate|research)\b', query.lower()):
+            question_type = 'analytical'
+        
+        # Domain density calculation
+        total_content_words = len([w for w in words if len(w) > 2])  # Filter short words
+        domain_densities = {}
+        for domain, terms in domain_terms.items():
+            domain_densities[domain] = len(terms) / total_content_words if total_content_words > 0 else 0
+        
+        # Lexical diversity (Type-Token Ratio)
+        unique_words = set(words)
+        lexical_diversity = len(unique_words) / len(words) if words else 0
         
         primary_tech_category = self._categorize_tech_terms(tech_keywords)
-        logger.info(f"Primary tech category determined: {primary_tech_category}")
         
         features = {
             'tech_keywords': tech_keywords,
+            'domain_terms': domain_terms,
+            'domain_densities': domain_densities,
             'action_verbs': action_verbs,
             'word_count': len(words),
             'complexity': complexity_indicators,
+            'intent_patterns': intent_patterns,
+            'question_type': question_type,
+            'lexical_diversity': lexical_diversity,
             'has_tech_terms': len(tech_keywords) > 0,
             'tech_term_count': len(tech_keywords),
-            'primary_tech_category': primary_tech_category
+            'primary_tech_category': primary_tech_category,
+            'has_technical_context': len(tech_keywords) > 0 or domain_densities.get('technical', 0) > 0.1,
+            'has_business_context': domain_densities.get('business', 0) > 0.1,
+            'has_academic_context': domain_densities.get('academic', 0) > 0.1
         }
         
-        logger.info(f"Feature extraction completed. Found {len(tech_keywords)} tech terms, tech density: {complexity_indicators['tech_density']:.2f}")
+        logger.info(f"Enhanced features - tech terms: {len(tech_keywords)}, domain densities: {domain_densities}")
+        logger.info(f"Question type: {question_type}, Intent patterns: {[k for k, v in intent_patterns.items() if v]}")
+        
+        return features
         
         return features
     
     def _categorize_tech_terms(self, tech_keywords: List[str]) -> str:
         """Categorize the primary technology focus based on found keywords"""
-        logger.info(f"Categorizing tech terms: {tech_keywords}")
         
         categories = {
             'programming': ['python', 'javascript', 'java', 'c++', 'c#', 'ruby', 'php', 'golang', 'rust'],
@@ -395,10 +609,8 @@ class QueryPreprocessor:
             score = sum(1 for keyword in tech_keywords if keyword in terms or any(keyword in term for term in terms))
             if score > 0:
                 category_scores[category] = score
-                logger.info(f"Category '{category}' scored {score} points")
         
         result = max(category_scores, key=category_scores.get) if category_scores else 'general'
-        logger.info(f"Primary tech category determined: {result} (scores: {category_scores})")
         
         return result
 
@@ -414,19 +626,16 @@ class QueryPreprocessor:
         Returns:
             ProcessedQuery object with normalized text and extracted features
         """
-        logger.info(f"Starting query preprocessing pipeline for: '{query[:100]}...'")
+        logger.info(f"Processing: '{query[:50]}...'")
         
         try:
             # Step 1: Normalize text
-            logger.info("Step 1: Text normalization")
             normalized = self.normalize_text(query)
             
             # Step 2: Extract features
-            logger.info("Step 2: Feature extraction")
             features = self.extract_features(normalized)
             
             # Step 3: Extract key terms and action verbs from features
-            logger.info("Step 3: Extract key terms and action verbs")
             key_terms = features.get('tech_keywords', [])
             action_verbs = features.get('action_verbs', [])
             
@@ -438,16 +647,12 @@ class QueryPreprocessor:
                 features=features
             )
             
-            logger.info(f"Query preprocessing completed successfully")
-            logger.info(f"Key terms found: {key_terms}")
-            logger.info(f"Action verbs found: {action_verbs}")
-            logger.info(f"Word count: {features.get('word_count', 0)}")
+            logger.info(f"Processed - terms: {len(key_terms)}, verbs: {len(action_verbs)}")
             
             return processed_query
             
         except Exception as e:
-            logger.warning(f"Error during query preprocessing: {str(e)}")
-            logger.warning("Falling back to basic processing")
+            logger.warning(f"Preprocessing error: {str(e)}")
             
             # Fallback processing if anything fails
             return ProcessedQuery(
@@ -464,16 +669,14 @@ class QueryClassifier:
     """
     
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
-        logger.info(f"Initializing QueryClassifier with model: {model_name}")
+        logger.info(f"Initializing QueryClassifier")
         
         # Load sentence transformer for embeddings
         try:
-            logger.info("Loading sentence transformer model...")
             self.embedding_model = SentenceTransformer(model_name)
-            logger.info("Sentence transformer model loaded successfully")
+            logger.info("Embedding model loaded")
         except Exception as e:
             logger.warning(f"Could not load embedding model: {e}")
-            logger.warning("Falling back to rule-based classification only")
             self.embedding_model = None
         
         # Define category patterns and keywords
@@ -518,24 +721,18 @@ class QueryClassifier:
             ]
         }
         
-        logger.info(f"Initialized category patterns for {len(self.category_patterns)} categories")
-        for category, keywords in self.category_patterns.items():
-            logger.info(f"Category '{category}': {len(keywords)} keywords")
-        
         # Pre-compute category embeddings if model available
         self.category_embeddings = {}
         if self.embedding_model:
             logger.info("Computing category embeddings...")
             self._compute_category_embeddings()
-            logger.info(f"Category embeddings computed for {len(self.category_embeddings)} categories")
         else:
-            logger.warning("Skipping category embeddings - no embedding model available")
+            logger.warning("No embedding model - using rules only")
 
         self.llm_client = None
         api_key_path = "Nebius_api_key.txt"  # Path to your API key file
         if api_key_path:
             try:
-                logger.info(f"Initializing LLM client for classification from: {api_key_path}")
                 with open(api_key_path, "r") as f:
                     api_key = f.read().strip()
                 
@@ -543,97 +740,372 @@ class QueryClassifier:
                     base_url="https://api.studio.nebius.ai/v1/",
                     api_key=api_key,
                 )
-                logger.info("LLM client for classification initialized successfully")
+                logger.info("LLM client initialized")
             except Exception as e:
                 logger.warning(f"Could not initialize LLM client: {e}")
-                logger.warning("Will use embedding and rule-based classification only")
         else:
-            logger.info("No API key provided - LLM classification disabled")
+            logger.info("No API key - LLM disabled")
         
         # Classification model for LLM
         self.classification_model = "Qwen/Qwen3-235B-A22B"  # Use the best model for classification
     
 
-        logger.info("QueryClassifier initialization completed")
+        logger.info("QueryClassifier ready")
 
     
     def _compute_category_embeddings(self):
-        """Pre-compute embeddings using multiple representative examples per category"""
-        logger.info("Computing enhanced category embeddings")
+        """Enhanced embedding computation with comprehensive examples and NLP augmentation"""
+        logger.info("Computing category embeddings...")
         
-        # Multiple diverse examples per category for better representation
+        # Significantly expanded and diverse examples per category for better representation
         category_examples = {
             'CODE_TECHNICAL': [
-                "write a python function to sort a list",
-                "debug this javascript error in my code",
-                "how to implement a binary search algorithm",
-                "optimize SQL query performance",
-                "fix compilation error in C++ program",
-                "create REST API endpoint",
-                "database schema design patterns"
+                # Programming fundamentals
+                "write a python function to sort a list using quicksort algorithm",
+                "debug this javascript error in my React component",
+                "how to implement binary search algorithm in C++",
+                "optimize SQL query performance for large datasets",
+                "fix compilation error in my Java program",
+                "create REST API endpoint using FastAPI",
+                "database schema design patterns for e-commerce",
+                
+                # Data Science & AI
+                "build machine learning model for image classification",
+                "implement neural network using TensorFlow",
+                "optimize hyperparameters for deep learning model",
+                "create data pipeline for ETL processing",
+                "implement recommendation system using collaborative filtering",
+                "analyze time series data using LSTM networks",
+                "build computer vision model for object detection",
+                "implement natural language processing for sentiment analysis",
+                
+                # Systems & DevOps
+                "configure Docker container for microservice deployment",
+                "implement user authentication in Node.js application",
+                "troubleshoot memory leak in Python application",
+                "set up CI/CD pipeline using Jenkins",
+                "configure load balancer for high availability",
+                "implement caching strategy using Redis",
+                "optimize application performance and scalability",
+                "configure cloud infrastructure on AWS",
+                
+                # Web Development
+                "create responsive web design using CSS Grid",
+                "implement state management in React with Redux",
+                "build GraphQL API with Apollo Server",
+                "optimize webpack bundle size for production",
+                "implement server-side rendering with Next.js",
+                "create progressive web app with service workers"
             ],
             'MATHEMATICAL_SCIENTIFIC': [
-                "calculate the derivative of this function",
-                "analyze statistical correlation in dataset",
-                "solve differential equation using numerical methods",
-                "what are the benefits of renewable energy in economics",
-                "research methodology for scientific experiments",
-                "data analysis and visualization techniques",
-                "mathematical modeling of population growth"
+                # Pure Mathematics
+                "calculate the derivative of exponential function",
+                "solve system of linear equations using matrix methods",
+                "find eigenvalues and eigenvectors of transformation matrix",
+                "compute integral using numerical integration methods",
+                "analyze convergence of infinite series",
+                "prove mathematical theorem using induction",
+                "optimize function subject to constraints using Lagrange multipliers",
+                "calculate probability distribution parameters",
+                
+                # Statistics & Data Analysis
+                "perform statistical hypothesis testing on experimental data",
+                "analyze correlation between variables in dataset",
+                "conduct regression analysis to predict outcomes",
+                "perform A/B testing for website optimization",
+                "analyze survey data using statistical methods",
+                "investigate patterns in financial market data",
+                "study demographic trends in population data",
+                "perform time series analysis and forecasting",
+                
+                # Scientific Research
+                "design controlled experiment to test hypothesis",
+                "investigate economic benefits of renewable energy",
+                "study correlation between education and income levels",
+                "research methodology for social science studies",
+                "analyze trends in scientific publication data",
+                "evaluate effectiveness of medical treatment",
+                "investigate environmental impact of industrial processes",
+                "study genetic factors in disease susceptibility",
+                "analyze climate change data using statistical models",
+                
+                # Applied Mathematics
+                "model population growth using differential equations",
+                "optimize resource allocation using linear programming",
+                "analyze network topology using graph theory",
+                "simulate physical systems using numerical methods",
+                "calculate risk assessment using probability theory"
             ],
             'EDUCATIONAL_ACADEMIC': [
-                "explain quantum physics concepts simply",
-                "teach me about photosynthesis process",
-                "what are the causes of world war 2",
-                "help me understand machine learning basics",
-                "summarize the main points of this research paper",
+                # Science Education
+                "explain quantum mechanics concepts in simple terms",
+                "teach me about photosynthesis process in plants",
+                "describe the structure of DNA and its function",
+                "explain how the human brain processes information",
+                "teach me about the water cycle and its importance",
+                "explain the concept of natural selection and evolution",
+                "describe chemical bonding in molecules",
+                "explain thermodynamics principles for physics students",
+                
+                # History & Social Sciences
+                "what are the causes of World War II",
+                "explain historical significance of Renaissance period",
+                "describe the impact of Industrial Revolution",
+                "explain the formation of democratic governments",
+                "teach me about ancient civilizations and their contributions",
+                "explain the causes and effects of economic recessions",
+                
+                # Learning Support
+                "help me understand calculus fundamentals",
                 "create study guide for biology exam",
-                "explain the economic benefits of renewable energy"
+                "explain the difference between mitosis and meiosis",
+                "help me prepare for physics test on electromagnetism",
+                "teach me about financial literacy and budgeting",
+                "explain programming concepts for beginners",
+                "help me understand statistics for research",
+                
+                # Academic Research & Methods
+                "summarize main points of research paper on climate change",
+                "explain methodology used in psychological studies",
+                "describe advantages of different research methods",
+                "help me understand statistical analysis techniques",
+                "explain the peer review process in academic publishing",
+                "describe ethical considerations in research",
+                "help me write literature review for thesis",
+                "explain how to conduct systematic review",
+                
+                # Benefits & Advantages Queries
+                "what are the benefits of renewable energy sources",
+                "explain advantages of online learning platforms",
+                "describe benefits of multilingual education",
+                "what are advantages of collaborative learning",
+                "explain benefits of critical thinking skills"
             ],
             'CREATIVE_ARTISTIC': [
-                "write a short story about space travel",
-                "create poem about autumn leaves",
-                "design logo for coffee shop",
-                "compose lyrics for a love song",
-                "brainstorm creative marketing campaign ideas",
-                "write character development for novel"
+                # Creative Writing
+                "write a short story about time travel paradox",
+                "create a poem about autumn leaves falling",
+                "develop character backstory for fantasy novel",
+                "write dialogue for dramatic theater scene",
+                "create compelling opening paragraph for mystery story",
+                "develop plot outline for science fiction story",
+                "write descriptive passage about mountain landscape",
+                "create rhyming poem about friendship and loyalty",
+                "develop unique setting for adventure story",
+                "write emotional monologue for stage performance",
+                
+                # Visual Design & Arts
+                "design logo for coffee shop brand identity",
+                "create color palette for modern website",
+                "develop visual identity for startup company",
+                "design poster for music festival event",
+                "create user interface for mobile app",
+                "develop branding strategy for new product",
+                "design infographic about environmental issues",
+                "create artistic composition using geometric shapes",
+                "design layout for magazine article",
+                "create album cover for indie music band",
+                
+                # Creative Brainstorming
+                "brainstorm creative solutions for urban transportation",
+                "generate innovative ideas for team building activities",
+                "develop unique concept for restaurant theme",
+                "create original game mechanics for board game",
+                "brainstorm creative marketing campaigns",
+                "generate ideas for community art project",
+                "develop unique approach to employee engagement",
+                "create innovative educational activities",
+                "brainstorm creative ways to reduce plastic waste",
+                "generate ideas for interactive museum exhibit",
+                
+                # Music & Performance
+                "compose melody for love song",
+                "create lyrics about social justice",
+                "develop choreography for dance performance",
+                "write script for short film",
+                "compose music for video game soundtrack"
             ],
             'BUSINESS_PROFESSIONAL': [
-                "draft professional email to client",
-                "create business proposal for new project",
-                "analyze market trends and competition",
-                "develop marketing strategy for product launch",
-                "write job description for software engineer",
-                "prepare financial forecast presentation"
+                # Business Strategy & Planning
+                "develop comprehensive business plan for new startup",
+                "create marketing strategy for product launch",
+                "analyze competitive landscape and market positioning",
+                "develop pricing strategy for subscription service",
+                "create financial projections for business expansion",
+                "design organizational structure for growing company",
+                "develop customer acquisition strategy",
+                "create employee retention program",
+                "analyze market trends and opportunities",
+                "develop partnership strategy for business growth",
+                
+                # Professional Communication
+                "write professional email to potential client",
+                "create presentation for board meeting",
+                "draft proposal for new project initiative",
+                "write job description for software engineer position",
+                "create performance review feedback for employee",
+                "draft contract terms for service agreement",
+                "write professional recommendation letter",
+                "create agenda for quarterly team meeting",
+                "draft press release for product announcement",
+                "write executive summary for business report",
+                
+                # Finance & Operations
+                "prepare financial forecast presentation",
+                "analyze budget allocation for marketing department",
+                "create investment proposal for venture capital",
+                "develop cost-benefit analysis for new technology",
+                "prepare quarterly earnings report",
+                "analyze return on investment for projects",
+                "create cash flow projections",
+                "develop risk assessment for business decisions",
+                
+                # Legal & Compliance
+                "understand legal requirements for business registration",
+                "draft terms of service for website",
+                "create privacy policy for mobile app",
+                "understand intellectual property protection",
+                "draft non-disclosure agreement for partnership",
+                "understand employment law compliance",
+                "create data protection policy",
+                "understand contract law principles",
+                "draft licensing agreement for software",
+                "understand regulatory compliance requirements",
+                
+                # Management & Leadership
+                "develop leadership training program",
+                "create conflict resolution procedures",
+                "design performance management system",
+                "develop succession planning strategy",
+                "create change management process"
             ],
             'CONVERSATIONAL_ADVICE': [
-                "what should I do about relationship problems",
-                "how to deal with stress at work",
-                "give me advice on career change",
+                # Personal Life Advice
+                "what should I do about relationship problems with partner",
+                "how to deal with stress at work effectively",
+                "give me advice on career change decisions",
                 "help me choose between two job offers",
-                "personal recommendations for healthy lifestyle",
-                "what's your opinion on this situation"
+                "what are good strategies for work-life balance",
+                "how to improve communication with family members",
+                "advice on managing personal finances better",
+                "help me decide on living situation",
+                "what should I consider when buying first car",
+                "advice on maintaining healthy relationships",
+                
+                # Lifestyle & Health Recommendations
+                "recommend good books for summer reading",
+                "suggest healthy meal ideas for busy schedule",
+                "what are good exercises for beginners",
+                "recommend travel destinations for families",
+                "suggest hobbies for creative expression",
+                "what are good ways to learn new skills",
+                "recommend strategies for better sleep",
+                "suggest ways to stay motivated during difficult times",
+                "what are good practices for mental health",
+                "recommend ways to build social connections",
+                
+                # Opinion & Discussion
+                "what's your opinion on remote work trends",
+                "discuss pros and cons of social media",
+                "what do you think about current technology trends",
+                "share thoughts on environmental conservation",
+                "discuss benefits of lifelong learning",
+                "what are your views on work-life integration",
+                "discuss importance of cultural diversity",
+                "share opinion on digital privacy concerns",
+                "discuss impact of artificial intelligence on society",
+                "what are your thoughts on sustainable living practices",
+                
+                # Decision Support
+                "help me weigh pros and cons of moving to new city",
+                "advice on whether to pursue graduate degree",
+                "should I start my own business or stay employed",
+                "help me decide on vacation destination",
+                "advice on choosing between different career paths",
+                "what factors should I consider when changing jobs",
+                "help me decide on major life changes",
+                "advice on balancing personal and professional goals"
             ]
         }
         
+        # Enhanced embedding computation with augmentation techniques
         try:
+            
             for category, examples in category_examples.items():
-                logger.info(f"Computing embeddings for category '{category}' using {len(examples)} examples")
                 
-                # Encode all examples for this category
+                # Basic embedding computation
                 embeddings = []
+                
+                # Encode original examples
                 for example in examples:
                     embedding = self.embedding_model.encode(example)
                     embeddings.append(embedding)
                 
-                # Use mean of all embeddings as category representation
-                category_embedding = np.mean(embeddings, axis=0)
-                self.category_embeddings[category] = category_embedding
+                # Add paraphrase augmentation if NLTK is available
+                if NLTK_AVAILABLE:
+                    augmented_examples = self._generate_paraphrases(examples[:10])  # Limit for performance
+                    
+                    for aug_example in augmented_examples:
+                        embedding = self.embedding_model.encode(aug_example)
+                        embeddings.append(embedding)
                 
-                logger.info(f"Category '{category}' embedding computed, shape: {category_embedding.shape}")
-                
+                # Compute category representation using centroid
+                if embeddings:
+                    category_embedding = np.mean(embeddings, axis=0)
+                    self.category_embeddings[category] = category_embedding
+                else:
+                    logger.warning(f"No embeddings computed for category '{category}'")
+                    
         except Exception as e:
-            logger.warning(f"Could not compute enhanced category embeddings: {e}")
+            logger.warning(f"Enhanced embedding computation failed: {e}")
+            
+            # Fallback to basic computation
+            for category, examples in category_examples.items():
+                try:
+                    embeddings = [self.embedding_model.encode(example) for example in examples]
+                    category_embedding = np.mean(embeddings, axis=0)
+                    self.category_embeddings[category] = category_embedding
+                except Exception as fallback_error:
+                    logger.error(f"Failed to compute embedding for '{category}': {fallback_error}")
+    
+    def _generate_paraphrases(self, examples: List[str]) -> List[str]:
+        """Generate paraphrased versions of examples for data augmentation"""
+        if not NLTK_AVAILABLE:
+            return []
+        
+        paraphrases = []
+        
+        try:
+            from nltk.corpus import wordnet
+            
+            for example in examples:
+                # Simple synonym-based paraphrasing
+                tokens = word_tokenize(example.lower())
+                paraphrased_tokens = []
+                
+                for token in tokens:
+                    # Get synonyms from WordNet
+                    synonyms = set()
+                    for syn in wordnet.synsets(token):
+                        for lemma in syn.lemmas():
+                            synonym = lemma.name().replace('_', ' ')
+                            if synonym != token and len(synonym) > 2:
+                                synonyms.add(synonym)
+                    
+                    # Use first synonym if available, otherwise keep original
+                    if synonyms and len(synonyms) > 0:
+                        paraphrased_tokens.append(list(synonyms)[0])
+                    else:
+                        paraphrased_tokens.append(token)
+                
+                paraphrase = ' '.join(paraphrased_tokens)
+                if paraphrase != example.lower() and len(paraphrase) > 10:
+                    paraphrases.append(paraphrase)
+                    
+        except Exception as e:
+            logger.warning(f"Paraphrase generation failed: {e}")
+        
+        return paraphrases[:5]  # Limit to 5 paraphrases per original
 
     def _classify_by_embedding(self, processed_query: ProcessedQuery) -> Tuple[str, float]:
         """Enhanced embedding-based classification with better similarity computation"""
@@ -688,105 +1160,267 @@ class QueryClassifier:
             logger.warning(f"Embedding classification failed: {e}")
             return self._classify_by_rules(processed_query)
     def _classify_by_rules(self, processed_query: ProcessedQuery) -> Tuple[str, float]:
-        """Enhanced rule-based classification with better matching and scoring"""
+        """Enhanced rule-based classification with advanced NLP features and scoring"""
         import re
         
         logger.info("Starting enhanced rule-based classification")
         query_text = processed_query.normalized_query.lower()
         original_text = processed_query.original_query.lower()
         
-        logger.info(f"Classifying query: '{query_text[:100]}...'")
+        # Initialize lexicon builder for domain term analysis
+        if not hasattr(self, 'lexicon_builder'):
+            self.lexicon_builder = DomainLexiconBuilder()
         
-        # Enhanced category patterns with weights and synonyms
+        # Enhanced intent pattern recognition
+        intent_patterns = {
+            'how_to': r'\b(how\s+to|how\s+do\s+i|how\s+can\s+i)\b',
+            'what_is': r'\b(what\s+is|what\s+are|what\s+does)\b',
+            'why': r'\b(why\s+is|why\s+do|why\s+does|why\s+are)\b',
+            'explain': r'\b(explain|describe|tell\s+me\s+about)\b',
+            'create': r'\b(create|build|make|generate|write)\b',
+            'fix': r'\b(fix|debug|solve|resolve|troubleshoot)\b',
+            'compare': r'\b(compare|difference|versus|vs)\b',
+            'analyze': r'\b(analyze|examine|study|investigate)\b',
+            'optimize': r'\b(optimize|improve|enhance|maximize|minimize)\b',
+            'find': r'\b(find|locate|identify|detect|discover)\b',
+            'calculate': r'\b(calculate|compute|measure|determine)\b'
+        }
+        
+        # Detect intent patterns
+        detected_intents = []
+        for intent, pattern in intent_patterns.items():
+            if re.search(pattern, query_text):
+                detected_intents.append(intent)
+        
+        # Question type detection
+        question_type = 'general'
+        question_patterns = {
+            'factual': r'^(what|when|where|who|which)\b',
+            'procedural': r'^(how|how\s+to|how\s+do|how\s+can)\b',
+            'causal': r'^(why|what\s+causes|what\s+makes)\b',
+            'comparative': r'\b(better|worse|difference|compare|versus|vs)\b',
+            'evaluative': r'\b(should|would|could|recommend|suggest|opinion)\b',
+            'creative': r'\b(create|write|design|compose|generate)\b',
+            'analytical': r'\b(analyze|examine|study|investigate|research)\b'
+        }
+        
+        for q_type, pattern in question_patterns.items():
+            if re.search(pattern, query_text):
+                question_type = q_type
+                break
+        
+        # Domain density analysis
+        tokens = query_text.split()
+        content_tokens = [token for token in tokens if len(token) > 2]  # Filter short words
+        total_tokens = len(content_tokens) if content_tokens else 1
+        
+        domain_densities = {}
+        for domain in ['technical', 'business', 'academic']:
+            domain_terms = self.lexicon_builder.get_domain_terms(domain)
+            found_terms = [token for token in content_tokens if token in domain_terms]
+            domain_densities[domain] = len(found_terms) / total_tokens
+        
+        # Enhanced category scoring with comprehensive rules
         enhanced_patterns = {
             'CODE_TECHNICAL': {
-                'primary': ['python', 'javascript', 'java', 'code', 'programming', 'debug', 'api', 'database', 'algorithm', 'function'],
-                'secondary': ['coding', 'software', 'development', 'bug', 'error', 'compile', 'syntax', 'variable', 'class', 'method'],
-                'phrases': ['write.*function', 'debug.*code', 'fix.*error', 'implement.*algorithm', 'create.*api']
+                'required_features': {
+                    'domain_density': ('technical', 0.2),  # At least 20% technical terms
+                    'intent_patterns': ['create', 'fix', 'how_to', 'optimize', 'find'],
+                    'question_types': ['procedural', 'creative', 'analytical']
+                },
+                'bonus_features': {
+                    'high_tech_density': ('technical', 0.4),  # Bonus for very high tech density
+                    'specific_patterns': [r'\b(iou|intersection|union)\b', r'\b(cell|tissue|distance)\b'],
+                    'multiple_intents': 2  # Bonus for multiple matching intents
+                },
+                'negative_indicators': {
+                    'domain_density': [('business', 0.3), ('academic', 0.4)]  # Penalties for other domains
+                }
             },
             'MATHEMATICAL_SCIENTIFIC': {
-                'primary': ['calculate', 'mathematics', 'equation', 'formula', 'statistics', 'analyze', 'research', 'study'],
-                'secondary': ['data analysis', 'correlation', 'hypothesis', 'methodology', 'scientific', 'numerical'],
-                'phrases': ['benefits.*of.*renewable', 'economic.*impact', 'analyze.*data', 'research.*on']
+                'required_features': {
+                    'domain_density': ('academic', 0.15),
+                    'intent_patterns': ['analyze', 'explain', 'what_is', 'calculate'],
+                    'question_types': ['factual', 'analytical', 'causal']
+                },
+                'bonus_features': {
+                    'research_patterns': [r'\b(benefits.*of.*renewable|economic.*impact|research.*on)\b'],
+                    'scientific_terms': [r'\b(correlation|hypothesis|methodology)\b']
+                },
+                'negative_indicators': {
+                    'domain_density': [('business', 0.2)]
+                }
             },
             'EDUCATIONAL_ACADEMIC': {
-                'primary': ['explain', 'teach', 'learn', 'education', 'academic', 'study'],
-                'secondary': ['benefits of', 'advantages of', 'what are', 'how does', 'why is', 'causes of'],
-                'phrases': ['explain.*concept', 'teach.*me', 'help.*understand', 'benefits.*of.*\\w+']
+                'required_features': {
+                    'domain_density': ('academic', 0.1),
+                    'intent_patterns': ['explain', 'what_is', 'why', 'how_to'],
+                    'question_types': ['factual', 'procedural', 'causal']
+                },
+                'bonus_features': {
+                    'educational_patterns': [r'\b(benefits.*of|advantages.*of|what.*are)\b'],
+                    'learning_context': [r'\b(teach|learn|study|understand)\b']
+                },
+                'negative_indicators': {}
             },
             'CREATIVE_ARTISTIC': {
-                'primary': ['write story', 'poem', 'creative', 'art', 'music', 'design'],
-                'secondary': ['narrative', 'character', 'plot', 'artistic', 'compose', 'brainstorm'],
-                'phrases': ['write.*story', 'create.*poem', 'design.*logo', 'compose.*lyrics']
+                'required_features': {
+                    'intent_patterns': ['create'],
+                    'question_types': ['creative', 'procedural']
+                },
+                'bonus_features': {
+                    'creative_patterns': [r'\b(write.*story|create.*poem|design.*logo)\b'],
+                    'artistic_terms': [r'\b(narrative|character|plot|artistic|compose)\b']
+                },
+                'negative_indicators': {
+                    'domain_density': [('technical', 0.3), ('business', 0.3)]
+                }
             },
             'BUSINESS_PROFESSIONAL': {
-                'primary': ['business', 'marketing', 'strategy', 'professional', 'proposal'],
-                'secondary': ['client', 'project', 'budget', 'revenue', 'market', 'financial'],
-                'phrases': ['business.*plan', 'marketing.*strategy', 'professional.*email']
+                'required_features': {
+                    'domain_density': ('business', 0.15),
+                    'intent_patterns': ['create', 'analyze', 'compare', 'explain'],
+                    'question_types': ['procedural', 'analytical', 'evaluative']
+                },
+                'bonus_features': {
+                    'legal_patterns': [r'\b(lawsuit|legal|contract|compliance)\b'],
+                    'business_context': [r'\b(professional|strategy|marketing)\b']
+                },
+                'negative_indicators': {}
             },
             'CONVERSATIONAL_ADVICE': {
-                'primary': ['advice', 'help me', 'what should i', 'recommend', 'opinion'],
-                'secondary': ['personal', 'relationship', 'lifestyle', 'suggest', 'guidance'],
-                'phrases': ['what should i do', 'give.*advice', 'help.*with.*problem']
+                'required_features': {
+                    'intent_patterns': ['how_to', 'what_is', 'why'],
+                    'question_types': ['evaluative', 'procedural', 'general']
+                },
+                'bonus_features': {
+                    'advice_patterns': [r'\b(advice|help.*me|what.*should.*i|recommend)\b'],
+                    'personal_context': [r'\b(personal|relationship|lifestyle)\b']
+                },
+                'negative_indicators': {
+                    'domain_density': [('technical', 0.2), ('business', 0.2), ('academic', 0.2)]
+                }
             }
         }
         
         category_scores = {}
         
-        for category, patterns in enhanced_patterns.items():
-            total_score = 0
+        for category, rules in enhanced_patterns.items():
+            total_score = 0.0
             matches_found = []
             
-            # Primary keywords (weight: 3)
-            for keyword in patterns['primary']:
-                if re.search(r'\b' + re.escape(keyword) + r'\b', query_text):
-                    total_score += 3
-                    matches_found.append(f"PRIMARY: {keyword}")
+            # Required features scoring
+            required = rules.get('required_features', {})
             
-            # Secondary keywords (weight: 1)
-            for keyword in patterns['secondary']:
-                if re.search(r'\b' + re.escape(keyword) + r'\b', query_text):
-                    total_score += 1
-                    matches_found.append(f"SECONDARY: {keyword}")
+            # Domain density requirements
+            if 'domain_density' in required:
+                domain, threshold = required['domain_density']
+                actual_density = domain_densities.get(domain, 0)
+                if actual_density >= threshold:
+                    total_score += 0.4  # Base score for meeting requirement
+                    total_score += actual_density * 0.3  # Bonus for exceeding
+                    matches_found.append(f"DOMAIN_DENSITY: {domain} ({actual_density:.3f})")
             
-            # Phrase patterns (weight: 5)
-            for phrase_pattern in patterns['phrases']:
-                if re.search(phrase_pattern, query_text):
-                    total_score += 5
-                    matches_found.append(f"PHRASE: {phrase_pattern}")
+            # Intent pattern requirements
+            if 'intent_patterns' in required:
+                required_intents = set(required['intent_patterns'])
+                found_intents = set(detected_intents)
+                matching_intents = required_intents.intersection(found_intents)
+                if matching_intents:
+                    total_score += 0.3
+                    total_score += len(matching_intents) * 0.1  # Bonus for multiple matches
+                    matches_found.append(f"INTENT: {matching_intents}")
             
-            # Calculate normalized score
-            max_possible_score = len(patterns['primary']) * 3 + len(patterns['secondary']) * 1 + len(patterns['phrases']) * 5
-            normalized_score = total_score / max_possible_score if max_possible_score > 0 else 0
+            # Question type requirements
+            if 'question_types' in required:
+                required_types = set(required['question_types'])
+                if question_type in required_types:
+                    total_score += 0.2
+                    matches_found.append(f"QUESTION_TYPE: {question_type}")
+            
+            # Bonus features
+            bonus = rules.get('bonus_features', {})
+            
+            # High domain density bonus
+            if 'high_tech_density' in bonus:
+                domain, threshold = bonus['high_tech_density']
+                if domain_densities.get(domain, 0) >= threshold:
+                    total_score += 0.2
+                    matches_found.append(f"HIGH_DENSITY_BONUS: {domain}")
+            
+            # Specific pattern bonuses
+            if 'specific_patterns' in bonus:
+                for pattern in bonus['specific_patterns']:
+                    if re.search(pattern, query_text):
+                        total_score += 0.15
+                        matches_found.append(f"SPECIFIC_PATTERN: {pattern}")
+            
+            # Research pattern bonuses
+            if 'research_patterns' in bonus:
+                for pattern in bonus['research_patterns']:
+                    if re.search(pattern, query_text):
+                        total_score += 0.15
+                        matches_found.append(f"RESEARCH_PATTERN: {pattern}")
+            
+            # Other pattern bonuses
+            for bonus_type in ['educational_patterns', 'creative_patterns', 'legal_patterns', 
+                              'business_context', 'advice_patterns', 'personal_context', 
+                              'scientific_terms', 'artistic_terms', 'learning_context']:
+                if bonus_type in bonus:
+                    for pattern in bonus[bonus_type]:
+                        if re.search(pattern, query_text):
+                            total_score += 0.1
+                            matches_found.append(f"{bonus_type.upper()}: {pattern}")
+            
+            # Multiple intents bonus
+            if 'multiple_intents' in bonus:
+                threshold = bonus['multiple_intents']
+                if len(detected_intents) >= threshold:
+                    total_score += 0.15
+                    matches_found.append(f"MULTIPLE_INTENTS: {len(detected_intents)}")
+            
+            # Negative indicators (penalties)
+            negative = rules.get('negative_indicators', {})
+            
+            if 'domain_density' in negative:
+                for domain, threshold in negative['domain_density']:
+                    actual_density = domain_densities.get(domain, 0)
+                    if actual_density > threshold:
+                        penalty = (actual_density - threshold) * 0.4
+                        total_score -= penalty
+                        matches_found.append(f"PENALTY: {domain} density ({actual_density:.3f})")
+            
+            # Ensure score is non-negative
+            total_score = max(0.0, total_score)
             
             category_scores[category] = {
-                'raw_score': total_score,
-                'normalized_score': normalized_score,
-                'matches': matches_found,
-                'max_possible': max_possible_score
+                'score': total_score,
+                'matches': matches_found
             }
             
             if matches_found:
-                logger.info(f"Category '{category}': {total_score}/{max_possible_score} points ({normalized_score:.3f}) - {matches_found}")
+                logger.info(f"Category '{category}': {total_score:.4f} - {matches_found}")
         
         # Find best category
-        if not category_scores or all(score['raw_score'] == 0 for score in category_scores.values()):
-            logger.warning("No keyword matches found, using fallback")
-            return 'CONVERSATIONAL_ADVICE', 0.05
+        if not category_scores or all(score['score'] == 0 for score in category_scores.values()):
+            logger.warning("No enhanced rule matches found, using fallback")
+            return 'CONVERSATIONAL_ADVICE', 0.1
         
-        best_category = max(category_scores, key=lambda x: category_scores[x]['normalized_score'])
-        best_score = category_scores[best_category]['normalized_score']
+        best_category = max(category_scores, key=lambda x: category_scores[x]['score'])
+        best_score = category_scores[best_category]['score']
         
-        # Better confidence calculation
-        confidence = min(best_score * 1.5, 1.0)  # Scale up but cap at 1.0
+        # Enhanced confidence calculation
+        confidence = min(best_score, 1.0)  # Cap at 1.0
         
-        # Bonus for multiple strong matches
-        if category_scores[best_category]['raw_score'] >= 8:
-            confidence = min(confidence + 0.2, 1.0)
-            logger.info("Multiple strong matches bonus applied")
+        # Bonus for very strong matches
+        if best_score >= 0.8:
+            confidence = min(confidence + 0.1, 1.0)
+            logger.info("Strong match confidence boost applied")
         
-        logger.info(f"Enhanced rule-based result: '{best_category}' with confidence {confidence:.3f}")
-        logger.info(f"Raw score: {category_scores[best_category]['raw_score']}, Normalized: {best_score:.3f}")
+        logger.info(f"Enhanced rule-based result: '{best_category}' with confidence {confidence:.4f}")
+        logger.info(f"Domain densities: {domain_densities}")
+        logger.info(f"Detected intents: {detected_intents}")
+        logger.info(f"Question type: {question_type}")
         
         return best_category, confidence
     
@@ -926,9 +1560,6 @@ class QueryClassifier:
                         category = 'MATHEMATICAL_SCIENTIFIC'
                     else:
                         category = 'BUSINESS_PROFESSIONAL'  # Default for legal questions
-                    
-                    logger.info(f"Manual extraction successful: {category} (confidence: {confidence:.4f})")
-                    return category, confidence
                 
                 # Final fallback - for lawsuit questions, default to BUSINESS_PROFESSIONAL
                 if 'lawsuit' in processed_query.original_query.lower() or 'legal' in processed_query.original_query.lower():
@@ -1554,18 +2185,22 @@ if __name__ == "__main__":
     router = LLMQueryRouter("Nebius_api_key.txt")
     
     # Process a sample query
-    test_query = "If I want to file a lawsuit against a company, what steps should I take?"
-    logger.info(f"Processing test query: '{test_query}'")
-    
-    result = router.process_query(test_query, include_judgment=False)
-    
-    print(f"Query: {test_query}")
-    print(f"Category: {result['classification']['category']}")
-    print(f"Confidence: {result['classification']['confidence']:.2f}")
-    print(f"Response: {result['response']}")
-    
-    if result.get('judgment'):
-        print(f"Quality Score: {result['judgment']['score']}/5")
-        print(f"Justification: {result['judgment']['justification']}")
-    
-    logger.info("Main execution completed")
+    # test_query = "If I want to file a lawsuit against a company, what steps should I take?"
+    queries = ["You're a senior software engineer. How do I debug this React component in the following code?",
+        "We have this article about DDPM. We want to differentiate this method fro mstable diffusion and DDIM, be concise",
+        "We're contemplating using LDA or NMF for topic modeling. Which one is better for our dataset?",]
+    for test_query in queries:
+        logger.info(f"Processing test query: '{test_query}'")
+        
+        result = router.process_query(test_query, include_judgment=False)
+        
+        print(f"Query: {test_query}")
+        print(f"Category: {result['classification']['category']}")
+        print(f"Confidence: {result['classification']['confidence']:.2f}")
+        print(f"Response: {result['response']}")
+        
+        if result.get('judgment'):
+            print(f"Quality Score: {result['judgment']['score']}/5")
+            print(f"Justification: {result['judgment']['justification']}")
+        
+        logger.info("Main execution completed")
