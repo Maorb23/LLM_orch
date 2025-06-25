@@ -61,6 +61,7 @@ class EnhancedQueryFeatures:
     intent_patterns: List[str] = field(default_factory=list)
     question_type: Optional[str] = None
     complexity_indicators: Dict[str, float] = field(default_factory=dict)
+    conversational_framing: List[str] = field(default_factory=list)  # New field
     
     # Statistical features
     domain_densities: Dict[str, float] = field(default_factory=dict)
@@ -245,6 +246,14 @@ class EnhancedNLPPreprocessor:
             'calculate': r'\b(calculate|compute|measure|determine)\b'
         }
         
+        # Conversational markers that indicate user is framing a technical question conversationally
+        self.conversational_framing_patterns = {
+            'role_based': r'\b(you\'re\s+a|as\s+a|being\s+a)\s+(senior|experienced|expert|professional)\s+(engineer|developer|scientist|researcher|analyst)\b',
+            'collaborative': r'\b(we\s+have|we\s+want|we\'re\s+contemplating|we\s+need|we\s+are)\b',
+            'contextual': r'\b(in\s+the\s+following|with\s+respect\s+to|regarding|concerning)\b',
+            'professional': r'\b(our\s+dataset|our\s+system|our\s+project|our\s+team)\b'
+        }
+        
         # Complexity indicators
         self.complexity_indicators = {
             'technical_jargon': r'\b(implementation|architecture|optimization|scalability|performance)\b',
@@ -321,6 +330,12 @@ class EnhancedNLPPreprocessor:
             if re.search(pattern, query_lower):
                 features.intent_patterns.append(intent)
         
+        # Detect conversational framing (indicates technical query phrased conversationally)
+        features.conversational_framing = []
+        for framing_type, pattern in self.conversational_framing_patterns.items():
+            if re.search(pattern, query_lower):
+                features.conversational_framing.append(framing_type)
+        
         # Question type detection
         features.question_type = self._detect_question_type(query)
         
@@ -346,6 +361,7 @@ class EnhancedNLPPreprocessor:
         logger.info(f"Enhanced feature extraction completed")
         logger.info(f"Domain densities: {features.domain_densities}")
         logger.info(f"Intent patterns: {features.intent_patterns}")
+        logger.info(f"Conversational framing: {features.conversational_framing}")
         
         return features
     
@@ -379,51 +395,55 @@ class EnhancedRuleBasedClassifier:
         self.classification_rules = {
             'CODE_TECHNICAL': {
                 'required_features': {
-                    'technical_terms': 0.3,  # At least 30% technical terms
+                    'technical_terms': 0.15,  # Reduced from 0.3 - allow conversational technical queries
                     'intent_patterns': ['create', 'fix', 'how_to', 'optimize', 'find', 'calculate'],
-                    'question_types': ['procedural', 'creative', 'analytical']
+                    'question_types': ['procedural', 'creative', 'analytical', 'comparative']  # Added comparative
                 },
                 'bonus_features': {
                     'complexity_indicators': ['code_elements', 'technical_jargon'],
                     'pos_patterns': ['VB', 'NN'],  # Verbs and nouns
                     'named_entities': True,
-                    'scientific_terms': 0.1  # Scientific + technical combination
+                    'scientific_terms': 0.1,  # Scientific + technical combination
+                    'conversational_framing': 0.3  # Bonus for conversational framing of technical questions
                 },
                 'negative_indicators': {
-                    'creative_terms': 0.2,  # Too many creative terms reduce score
-                    'business_terms': 0.3   # Too many business terms reduce score
+                    'creative_terms': 0.3,  # Too many creative terms reduce score
+                    'business_terms': 0.4   # Too many business terms reduce score
                 }
             },
             'MATHEMATICAL_SCIENTIFIC': {
                 'required_features': {
-                    'scientific_terms': 0.2,
-                    'academic_terms': 0.2,
-                    'intent_patterns': ['analyze', 'explain', 'what_is'],
-                    'question_types': ['factual', 'analytical', 'causal']
+                    'scientific_terms': 0.1,  # Reduced from 0.2
+                    'academic_terms': 0.1,    # Reduced from 0.2
+                    'intent_patterns': ['analyze', 'explain', 'what_is', 'compare', 'calculate'],
+                    'question_types': ['factual', 'analytical', 'causal', 'comparative']
                 },
                 'bonus_features': {
                     'complexity_indicators': ['mathematical', 'academic_language'],
-                    'technical_terms': 0.1  # Some technical overlap is okay
+                    'technical_terms': 0.15,  # Increased - scientific often overlaps with technical
+                    'conversational_framing': 0.2  # Bonus for conversational framing
                 },
                 'negative_indicators': {
-                    'creative_terms': 0.3,
-                    'business_terms': 0.2
+                    'creative_terms': 0.4,
+                    'business_terms': 0.3
                 }
             },
             'EDUCATIONAL_ACADEMIC': {
                 'required_features': {
-                    'academic_terms': 0.2,
+                    'academic_terms': 0.1,  # Reduced from 0.2
                     'intent_patterns': ['explain', 'what_is', 'why', 'how_to'],
                     'question_types': ['factual', 'procedural', 'causal']
                 },
                 'bonus_features': {
                     'complexity_indicators': ['academic_language', 'formal_language'],
-                    'scientific_terms': 0.1,
-                    'lexical_diversity': 0.5  # Educational content tends to be diverse
+                    'scientific_terms': 0.15,
+                    'technical_terms': 0.1,  # Allow some technical terms in education
+                    'lexical_diversity': 0.5,  # Educational content tends to be diverse
+                    'conversational_framing': 0.15  # Smaller bonus for conversational framing
                 },
                 'negative_indicators': {
-                    'business_terms': 0.2,
-                    'technical_terms': 0.1  # Some technical terms are okay in education
+                    'business_terms': 0.3,
+                    'creative_terms': 0.2
                 }
             },
             'CREATIVE_ARTISTIC': {
@@ -437,24 +457,26 @@ class EnhancedRuleBasedClassifier:
                     'lexical_diversity': 0.6
                 },
                 'negative_indicators': {
-                    'technical_terms': 0.3,
-                    'business_terms': 0.3,
-                    'scientific_terms': 0.3
+                    'technical_terms': 0.4,  # Increased penalty
+                    'business_terms': 0.4,   # Increased penalty
+                    'scientific_terms': 0.4, # Increased penalty
+                    'conversational_framing': 0.1  # Slight penalty for professional framing
                 }
             },
             'BUSINESS_PROFESSIONAL': {
                 'required_features': {
-                    'business_terms': 0.2,
+                    'business_terms': 0.15,  # Reduced from 0.2
                     'intent_patterns': ['create', 'analyze', 'compare', 'explain'],
-                    'question_types': ['procedural', 'analytical', 'evaluative']
+                    'question_types': ['procedural', 'analytical', 'evaluative', 'comparative']
                 },
                 'bonus_features': {
                     'complexity_indicators': ['formal_language'],
-                    'named_entities': True
+                    'named_entities': True,
+                    'conversational_framing': 0.25  # Bonus for professional conversational framing
                 },
                 'negative_indicators': {
-                    'creative_terms': 0.3,
-                    'technical_terms': 0.1  # Some technical terms are okay in business
+                    'creative_terms': 0.4,
+                    'technical_terms': 0.05  # Reduced penalty - business often involves technical discussions
                 }
             },
             'CONVERSATIONAL_ADVICE': {
@@ -466,10 +488,11 @@ class EnhancedRuleBasedClassifier:
                     'lexical_diversity': 0.3  # Conversational tends to be simpler
                 },
                 'negative_indicators': {
-                    'technical_terms': 0.2,
-                    'business_terms': 0.2,
-                    'academic_terms': 0.2,
-                    'scientific_terms': 0.2
+                    'technical_terms': 0.15,      # Reduced penalty
+                    'business_terms': 0.15,       # Reduced penalty
+                    'academic_terms': 0.15,       # Reduced penalty
+                    'scientific_terms': 0.15,     # Reduced penalty
+                    'conversational_framing': 0.4  # Strong penalty for professional framing
                 }
             }
         }
@@ -563,6 +586,11 @@ class EnhancedRuleBasedClassifier:
             if pos_matches > 0:
                 score += (pos_matches / len(pos_tags)) * 0.1 if pos_tags else 0
         
+        # Conversational framing bonus
+        if 'conversational_framing' in bonus and features.conversational_framing:
+            framing_score = len(features.conversational_framing) * bonus['conversational_framing']
+            score += framing_score
+        
         # Negative indicators (penalties)
         negative = rules.get('negative_indicators', {})
         
@@ -572,6 +600,11 @@ class EnhancedRuleBasedClassifier:
                 actual_density = features.domain_densities.get(domain_key, 0)
                 if actual_density > threshold:
                     penalty = (actual_density - threshold) * 0.3
+                    score -= penalty
+            elif domain == 'conversational_framing':
+                # Apply penalty if conversational framing is present
+                if features.conversational_framing:
+                    penalty = len(features.conversational_framing) * threshold
                     score -= penalty
         
         # Ensure score is non-negative
@@ -620,7 +653,7 @@ class EnhancedEmbeddingClassifier:
     def _generate_technical_examples(self) -> List[str]:
         """Generate comprehensive technical query examples"""
         return [
-            # Programming queries
+            # Programming queries - now with conversational framing
             "write a python function to sort a list of numbers",
             "debug this javascript error in my React component",
             "how to implement binary search algorithm in C++",
@@ -632,7 +665,19 @@ class EnhancedEmbeddingClassifier:
             "troubleshoot memory leak in Python application",
             "configure Docker container for microservice deployment",
             
-            # Data science queries
+            # Conversational technical queries - added to improve classification
+            "You're a senior software engineer. How do I debug this React component?",
+            "As an experienced developer, what's the best way to optimize this SQL query?",
+            "We have a performance issue with our microservice. How to troubleshoot?",
+            "I'm a junior developer. Can you help me implement authentication?",
+            "Our team is struggling with this deployment issue. Any suggestions?",
+            "Being a DevOps engineer, how would you configure this Docker setup?",
+            "We're contemplating migrating to microservices. What's your approach?",
+            "As a technical lead, how do you handle code reviews efficiently?",
+            "Our startup needs to implement CI/CD. What tools do you recommend?",
+            "We have legacy code that needs refactoring. Best practices?",
+            
+            # Data science queries - now with conversational framing
             "build machine learning model for image classification",
             "implement neural network using TensorFlow",
             "optimize hyperparameters for deep learning model",
@@ -643,6 +688,18 @@ class EnhancedEmbeddingClassifier:
             "implement natural language processing for sentiment analysis",
             "create automated feature engineering pipeline",
             "deploy machine learning model to production",
+            
+            # Conversational data science queries
+            "We're contemplating using LDA or NMF for topic modeling. Which is better?",
+            "As a data scientist, how do you approach feature selection?",
+            "Our team needs to implement A/B testing. What's your methodology?",
+            "We have this dataset with missing values. How to handle it?",
+            "Being an ML engineer, what's your approach to model deployment?",
+            "We're comparing deep learning frameworks. TensorFlow vs PyTorch?",
+            "Our startup needs to build a recommendation engine. Where to start?",
+            "We have imbalanced data. What techniques do you recommend?",
+            "As an AI researcher, how do you evaluate model performance?",
+            "We're implementing computer vision. What preprocessing steps?",
             
             # Computer vision and image processing
             "segment cells in microscopy images using deep learning",
@@ -672,7 +729,7 @@ class EnhancedEmbeddingClassifier:
     def _generate_scientific_examples(self) -> List[str]:
         """Generate comprehensive scientific query examples"""
         return [
-            # Mathematical queries
+            # Mathematical queries - now with conversational framing
             "calculate the derivative of exponential function",
             "solve system of linear equations using matrix methods",
             "find eigenvalues and eigenvectors of matrix",
@@ -683,6 +740,18 @@ class EnhancedEmbeddingClassifier:
             "calculate probability distribution parameters",
             "perform statistical hypothesis testing",
             "analyze correlation between variables",
+            
+            # Conversational scientific queries
+            "We have this article about DDPM. How does it differ from stable diffusion?",
+            "As a researcher, what's your take on DDIM vs other diffusion methods?",
+            "Our team is studying neural networks. Can you explain backpropagation?",
+            "We're analyzing experimental data. Which statistical test to use?",
+            "Being a statistician, how do you handle multiple comparisons?",
+            "We have this research on climate models. How to validate results?",
+            "Our lab needs to design experiments. What's your methodology?",
+            "We're comparing different optimization algorithms. Which performs better?",
+            "As a physicist, how do you approach uncertainty quantification?",
+            "Our research involves Bayesian inference. Best practices?",
             
             # Scientific research queries
             "design controlled experiment to test hypothesis",
