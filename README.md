@@ -1,9 +1,5 @@
 # LLM_orchestrator
 
-### Folders:
-
-We have empty dev and prod folders for placeholders, scripts on main.
-
 ### Scripts:
 - extract_json.py - Extracts csv from json. creates for **each query** a new row.
 - judgeLLM.py - our classes with main for testing on generated queries and answers. Right now focuesed only on **Non-code** queries and answers. Adding code suppport might be hard to do good but can use same logic for an above averag judge initially.
