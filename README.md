@@ -1,5 +1,5 @@
 # LLM_orchestrator
-**Classifying Prompts using Sentence LLMs or LLM as a judge.** 
+**Classifying Prompts using Sentence LLMs or LLM as a judge:** 
 
 ### Scripts:
 - extract_json.py - Extracts csv from json. creates for **each query** a new row.
